@@ -1,12 +1,12 @@
 # Load 'n' Cache
-* Read it like "Rock 'n' roll" or "Lock 'n' load" *
+*Read it like "Rock 'n' roll" or "Lock 'n' load"*
 
 This is a simple library that i initially wrote while working on a large AngularJS application to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user informations for 10 minutes but then it become a corner stone of the project. 
 
 Being this useful i thought it was a pity not to make it public and available for modern javascript frameworks. Enough said,I decided to rewrite it from scratch and make it freely available.
 
 ## The problem 
-As any other library this one solves a common problem, load a resource, the result of a REST service for instance, and make it available for subsequent calls without calling the service again or impacting calling code. Check the following code as an example of what NOT TO DO.
+As any other library this one solves a common problem, load a resource, the result of a REST service for instance, and make it available for subsequent calls without calling the service again or impacting calling code. Check the following code as an example of what **NOT TO DO**.
 
 ```javascript
 var user;
@@ -23,8 +23,8 @@ function getUser() {
 }
 ```
 The code above is loosely based on something i found in a production environment and has a lot of problems:
-    1. Invoking getUser() multiple times may trigger multiple subsequent calls to the backend.
-    1. You can never be sure if user is undefined because the backend did not worked or it's not loaded yet.
+1. Invoking getUser() multiple times may trigger multiple subsequent calls to the backend.
+1. You can never be sure if user is undefined because the backend did not worked or it's not loaded yet.
 You can improve this code by making wise usage of promises patterns but, as you take more scenarios into account, handling gets harder.
 
 ## A simple yet powerful solution
@@ -39,24 +39,24 @@ function getUser() {
 
 ```
 The LoadNCache object will take care of:
-    * Call the provided "loadFunction" the first time the `get()` method is called;
-    * call the function again if the cached value is invalidated (e.g. for an explicit call to `.flush()` or the configured "autoflush" occurred);
-    * return the same promise over and over again, this mean that it is immediatly resolved if the value was already fetched;
-    * returning the same promise also mean that you can `.catch()` the error multiple times from different callers;
-    * emit events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
+* Call the provided "loadFunction" the first time the `get()` method is called;
+* call the function again if the cached value is invalidated (e.g. for an explicit call to `.flush()` or the configured "autoflush" occurred);
+* return the same promise over and over again, this mean that it is immediatly resolved if the value was already fetched;
+* returning the same promise also mean that you can `.catch()` the error multiple times from different callers;
+* emit events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
 
 ## In depth Documentation
 LoadNCache is a class that is only responsible for calling a "loadFunction" at the right moment and storing the returned value for the future. Each class instance can be configured to work in a different way so data can be stored using the righe policy. For example the following are all use cases that can be easily implemented using LoadNCache:
-    * Load user data and store them for up to 10 minutes.
-    * Load action available and store them on localStorage so after refreshing the page data are not downloaded again.
-    * Perform some CPU intensive task and store the result to avoid computing the value again.
-    * Load a short-lived value from the server only if it is actually needed, like the server date and time. 
+* Load user data and store them for up to 10 minutes.
+* Load action available and store them on localStorage so after refreshing the page data are not downloaded again.
+* Perform some CPU intensive task and store the result to avoid computing the value again.
+* Load a short-lived value from the server only if it is actually needed, like the server date and time. 
 
 ### What is a "loadFunction"?
 As the names goes it is a javascript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
 The return value of the loadFunction is handled as follows
-    * if it is undefined, null or any other value, expect for Promises, it is wrapped into a resolved promise and stored;
-    * If it is a Promise the value is stored as is.
+* if it is undefined, null or any other value, expect for Promises, it is wrapped into a resolved promise and stored;
+* If it is a Promise the value is stored as is.
 The loadFunction should be stateless as it may be called immediatly, in the future or never. 
 
 So when the loadFunction is called? Anytime a new value needs to be retrieved. This usually happen after a call to the .get() method if no cached value is available. If a persisted value is available it may happen that the loadFunction is never called.
@@ -66,14 +66,14 @@ So when the loadFunction is called? Anytime a new value needs to be retrieved. T
 The LoadNCache constructor accept an options object. If default options are ok for you then you can pass in a function. Passing a function is the same as passing only the loader option in the options parameter.
 
 ##### Options
-* *loader: () => any*: the loadFunction. This is the only option that must be provided.
-* *disableEvents: boolean*: don't want events to be dispathed? Set this to true. Defaults to false.
-* *autoFlushTime: number*: how long (in millis) the value should be kept. As soon as time elapsed an automatic call to .flush() is executed. Setting it to 0 or a negative value disable this feature. Defaults to 0.
-* *persistance: string | PersistanceManager*: there are 2 supported string values:
-    * *localStorage*: the promise result is serialized as JSON and stored into localStorage. You must provide a storageKey option to specify the name of the localStorage key.
-    * *sessionStorage*: the promise result is serialized as JSON and stored into sessionStorage. You must provide a storageKey option to specify the name of the sessionStorage key.
+* `loader: () => any`: the loadFunction. This is the only option that must be provided.
+* `disableEvents: boolean`: don't want events to be dispathed? Set this to true. Defaults to false.
+* `autoFlushTime: number`: how long (in millis) the value should be kept. As soon as time elapsed an automatic call to .flush() is executed. Setting it to 0 or a negative value disable this feature. Defaults to 0.
+* `persistance: string | PersistanceManager`: there are 2 supported string values:
+    * `localStorage`: the promise result is serialized as JSON and stored into localStorage. You must provide a storageKey option to specify the name of the localStorage key.
+    * `sessionStorage`: the promise result is serialized as JSON and stored into sessionStorage. You must provide a storageKey option to specify the name of the sessionStorage key.
     * Or you can provied your own PersistanceManager by implementing the interface. 
-* *persistanceKey: string*: if persisting on a default key-value storage (localStorage or sessionStorage) this option specify the key to use to store data.
+* `persistanceKey: string`: if persisting on a default key-value storage (localStorage or sessionStorage) this option specify the key to use to store data.
 
 #### .get()
 Retrieve the value. Always returns a promise. This call may result in the loadFunction being called but is up to the instance to decide whatever this should happen or not.
@@ -161,7 +161,7 @@ class TimeService{
         });
     }
 
-    getServerTime(ì){
+    getServerTime(){
         return this._serverTime.get();
     }
 }
