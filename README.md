@@ -1,9 +1,9 @@
 # Load 'n' Cache
 *Read it like "Rock 'n' roll" or "Lock 'n' load"*
 
-This is a simple library that i initially wrote while working on a large AngularJS application to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user informations for 10 minutes but then it become a corner stone of the project. 
+This is a simple library that I initially wrote while working on a large AngularJS application. The goal is to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user informations for 10 minutes but it quickly become a corner stone of the project. 
 
-Being this useful i thought it was a pity not to make it public and available for modern javascript frameworks. Enough said,I decided to rewrite it from scratch and make it freely available.
+Being this useful i thought it was a pity not to make it public and available for modern javascript frameworks. Enough said, I decided to rewrite it from scratch and make it freely available.
 
 ## The problem 
 As any other library this one solves a common problem, load a resource, the result of a REST service for instance, and make it available for subsequent calls without calling the service again or impacting calling code. Check the following code as an example of what **NOT TO DO**.
@@ -101,7 +101,7 @@ Also be sure that Promises are supported by your target platform both natively o
 Only promises fulfilled are persisted using the persistance manager. Rejected promises are not persisted as design. The main reason behind this choice is to make it easier to handle persistance errors. I can refactor the code to allow for storing refused promises but I can't see a useful use case right now. Let me know if you have a different opinion.
 
 ### Autoflush is relative to promise resolution/rejection
-The autoflush time is measured starting at promise is resolution or rejection. So if 5000ms are configured and promise resolution took 60000ms then the .flush() method will be called after 65000ms.
+The autoflush time is measured starting at promise resolution or rejection. So if 5000ms are configured and promise resolution took 60000ms then the .flush() method will be called after 65000ms.
 Also remember that the autoflush is subject to small delay due to javascript event queue. 
 
 ## Recipes
