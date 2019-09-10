@@ -33,7 +33,7 @@ export interface Configuration<T>{
     persistance? : string | PersistanceManager<T>,
 
     /**
-     * If persisting on a key-value storage (like localStorage or sessionStorage) this option
+     * If persisting on a default key-value storage (like localStorage or sessionStorage) this option
      * specify the key to use to store data.
      */
     persistanceKey? : string;

@@ -1,9 +1,8 @@
 import {EventEmitter} from 'eventemitter3';
-import {toPromise} from './util/types';
 import {Configuration} from './Configuration';
 import {LocalStorageManager, SessionStorageManager, NoopManager} from './persistance/DefaultStorages';
-import {PersistanceManager} from './persistance/PersistanceManager';
-import { TimestampedValue } from './util/timestamped';
+import {PersistanceManager, isTimestampedValue, TimestampedValue} from './persistance/PersistanceManager';
+import {PromiseAndTimestamp } from './util/dtos';
 
 
 const defaultCfg : Configuration<any> = {
@@ -12,9 +11,9 @@ const defaultCfg : Configuration<any> = {
     persistance: new NoopManager()
 };
 
-const defaultPersistanceManagers = {
-    'localStorage': (key) => new LocalStorageManager(key),
-    'sessionStorage': (key) => new SessionStorageManager(key)
+const defaultPersistanceManagers : {[index:string]: (key:string) => PersistanceManager<any>} = {
+    'localStorage': (key: string) => new LocalStorageManager(key),
+    'sessionStorage': (key: string) => new SessionStorageManager(key)
 };
 
 /**
@@ -27,14 +26,14 @@ export class LoadNCache<T> extends EventEmitter {
     private config : Configuration<T>;
 
     /**
-     * The promise holding the value.
+     * Persistance manager casted to right type.
      */
-    private promise: Promise<T>;
+    private persistanceManager: PersistanceManager<T>;
 
     /**
-     * When was the value fetched? Primarily used to setup autoflush.
+     * The promise holding the value.
      */
-    private promiseTs: number;
+    private promise?: Promise<T>;
 
     /**
      * Is this the first time we load a value?
@@ -45,7 +44,9 @@ export class LoadNCache<T> extends EventEmitter {
      * Initialize the object with given setting.
      * @param {any} cfg Instance settings or a load function.
      */
-    constructor(cfg : ()=>any | Configuration<T>) {
+    constructor(cfg : Configuration<T>)
+    constructor(cfg : ()=> Promise<T>)
+    constructor(cfg : any) {
         super();
 
         this.config = Object.assign({}, defaultCfg, typeof cfg === 'function' ? {loader: cfg} : cfg);
@@ -56,95 +57,120 @@ export class LoadNCache<T> extends EventEmitter {
 
         // Resolve persistance manager if a name was given.
         if (typeof this.config.persistance === 'string') {
-            let pm = defaultPersistanceManagers[this.config.persistance];
-            if (pm === undefined) {
-                console.error(`Unknown persistance manager requested (${this.config.persistance}). `+
-                                `Defaulting to Noop.`);
-                pm = new NoopManager();
+            const pm = defaultPersistanceManagers[this.config.persistance];
+            const pmKey  = this.config.persistanceKey;
+            if (pm && pmKey) {
+                this.persistanceManager = pm(pmKey);
             }
-            this.config.persistance = pm(this.config.persistanceKey);
-        }
-    }
-
-    /**
-     * This async function try to load the value from the storage the first time it is
-     * called, per instance. If no value is available or it was called already it returns
-     * undefined. 
-     * @return {Promise} a promise that is resolved with the value or undefined if no value is found.
-     */
-    private async loadFromStorageFirstTime() : Promise<TimestampedValue<T>>{
-        if (!this.firstLoad)
-            return;
-
-        this.firstLoad = false;
-        try{
-            const v = await (this.config.persistance as PersistanceManager<T>).loadValue();
-            if (!v || v.promise === undefined)
-                return;
-            return v;
-        }
-        catch(err){
-            console.debug('Persistance manager error', err);
-            return;
-        }
-    }
-
-    /**
-     * Try to load a value from the storage. If we don't find a value or an error occurs we fallback
-     * to the loadFunction.
-     * @return {Promise} a promise that is resolved with the value or undefined if no value is found.
-     */
-    private async loadNextValue() : Promise<TimestampedValue<T>>{
-        const loaded = await this.loadFromStorageFirstTime();
-        if (loaded !== undefined){
-            return loaded;
+            else{
+                console.error(`Unknown persistance manager requested (${this.config.persistance}) ` +
+                                `or empty persistanceKey. Defaulting to Noop.`);
+                this.persistanceManager = new NoopManager();
+            }
         }else{
-            return {
-                ts: new Date().getTime(),
-                promise: toPromise(this.config.loader())
-            };
+            this.persistanceManager = this.config.persistance as PersistanceManager<T>;
         }
     }
 
-    private setupAutoflush(){
-        if (!this.config.autoFlushTime || this.config.autoFlushTime < 0)
+    /**
+     * Prepare the auto flush according to configuration. If this feature
+     * is disabled by configuration this method does nothing.
+     */
+    private setupAutoflush(fetchTs: number){
+        const ttl = this.computeTtl(fetchTs!);
+        if (ttl === Infinity)
             return;
-        
-        const now = new Date().getTime();
-        const flushAt = this.promiseTs + this.config.autoFlushTime;
-        if (now <= flushAt){
+
+        if (ttl <= 0){
             // Should already be flushed!
             this.flush();
         }
         else{
-            setTimeout(() => this.flush(), now - flushAt);
+            setTimeout(() => this.flush(), ttl);
         }
     }
 
     /**
-     * This is the method responsible for storing a new value into
-     * the value field.
+     * This method computes how long a value fetched at the given timestamp 
+     * has left to live according to the configuration. If autoflush is 
+     * disable this method always returns Infinity.
+     * @returns Infinity if the value should not autoexpire, a positive number if it still 
+     * valid, 0 or negative if it is expired.
      */
-    private fetchNewValue() {
-        this.emit('beforeLoad', this);
+    private computeTtl(timestamp: number){
+        if (!this.config.autoFlushTime || this.config.autoFlushTime < 0)
+            return Infinity;
         
-        this.promise = this.loadNextValue()
-                            .then((value: TimestampedValue<T>) => {
-                                // The value obtained from the loadFunction is decorated with 
-                                // a timestamp. We need to unwrap it before returning the value
-                                // to the caller.
-                                this.promiseTs = value.ts;
-                                this.setupAutoflush();
-                                return value.promise;
-                            },
-                            (err) => {
-                                // We cache the rejection that may still be autoflushed.
-                                this.promiseTs = new Date().getTime();
-                                this.setupAutoflush();
-                                return Promise.reject(err);
-                            });
+        const now = new Date().getTime();
+        const flushAt = timestamp + this.config.autoFlushTime;
+        return flushAt - now;
+    }
 
-        this.emit('afterLoad', this);
+    /**
+     * Calls the saveValue() method and handle errors.
+     * @param val The value 
+     */
+    private async persistData(val: TimestampedValue<T>){
+        try{
+            await this.persistanceManager.saveValue(val);
+        }catch(err){
+            console.warn("Persistance error while saving data: ", err);
+        }
+    }
+
+    /**
+     * Invoke the loadFunction ensuring that its returned value is a promise.
+     * The check is ensured implicitly by using the async qualifier.
+     */
+    private async callLoadFunction(){
+        return this.config.loader!();
+    }
+
+    /**
+     * This method load a new value from storage or by calling a loadFunction.
+     * As soon as the value is available (which can be also a rejected promise) its
+     * stored as a promise along with the timestamp.
+     */
+    private async loadNewValue() : Promise<PromiseAndTimestamp<T>>{
+
+        if (this.firstLoad){
+            try{
+                const val = await this.persistanceManager.loadValue();
+                
+                // If val is not the type of object we expect we ignore it. This
+                // is also the case when no value was found.
+                if (isTimestampedValue(val)){
+                    if (this.computeTtl(val.ts) > 0){
+                        return {ts : val.ts, promise: Promise.resolve(val.value)};
+                    }
+                }
+                    
+
+            } catch(err) {
+                // If we have an error we print it for the sake of debugging but
+                // no further actions are required.   
+                if (err) 
+                    console.warn("Persistance error while loading value.", err);
+            }
+        }
+
+        // We need to call the loading function.
+        let promise : Promise<T>;
+        let ts;
+        try{
+            // Resolved promise handling
+            const value = await this.callLoadFunction();
+            promise = Promise.resolve(value);
+            ts = new Date().getTime();
+            await this.persistData({ts, value});
+        }
+        catch(err){
+            // Rejected promises
+            promise = Promise.reject(err);
+            ts = new Date().getTime();
+        }
+
+        return {ts, promise : promise!};
     }
 
     /**
@@ -152,10 +178,22 @@ export class LoadNCache<T> extends EventEmitter {
      * or a stored one.
      * @return {Promise} A promise that will be resolved with the value or reject if fetching fails.
      */
-    public get() : Promise<T> {
-        if (!this.promise) {
-            this.fetchNewValue();
+    public get(){
+        if (!this.promise){
+            if (!this.config.disableEvents)
+                this.emit('before-load', this);
+
+            this.promise = this.loadNewValue().then((pnt) => {
+                this.setupAutoflush(pnt.ts);
+
+                if (!this.config.disableEvents)
+                    this.emit('after-load', this);
+
+                return pnt.promise;
+            });
         }
+            
+        
         return this.promise;
     }
 
@@ -163,10 +201,20 @@ export class LoadNCache<T> extends EventEmitter {
      * Flush the current cached value.
      */
     public flush() {
-        this.emit('beforeFlush', this);
+        if (!this.config.disableEvents)
+            this.emit('before-flush', this);
+
         this.promise = undefined;
-        (this.config.persistance as PersistanceManager<T>).clear();
-        this.emit('afterFlush', this);
+        try{
+            this.persistanceManager.clear();
+        }
+        catch(err){
+            console.warn("Persistance error while flushing value.", err);
+        }
+        
+        
+        if (!this.config.disableEvents)
+            this.emit('after-flush', this);
     }
 
     /**
