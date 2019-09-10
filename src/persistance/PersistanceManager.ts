@@ -16,11 +16,12 @@ export interface TimestampedValue<T>{
 
 /**
  * Type guard to check that the object is a TimestampedValue.
- * @param obj 
+ * @param {any} obj The object to inspect
+ * @return {boolean} whatever it is.
  */
-export function isTimestampedValue(obj: any): obj is TimestampedValue<any>{
+export function isTimestampedValue(obj: any): obj is TimestampedValue<any> {
     return obj && typeof obj.ts === 'number';
-} 
+}
 
 /**
  * Provide logic to save and retrieve a value from storage.
@@ -33,12 +34,12 @@ export interface PersistanceManager<T> {
     loadValue: () => Promise<TimestampedValue<T> | void>;
 
     /**
-     * Save a new value to the storage. 
+     * Save a new value to the storage.
      */
     saveValue: (value: TimestampedValue<T>) => Promise<any>;
 
     /**
-     * When this method is called if a persisted value is available 
+     * When this method is called if a persisted value is available
      * it must be erased.
      */
     clear: ()=> void;

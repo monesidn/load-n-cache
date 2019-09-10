@@ -2,7 +2,7 @@ import {EventEmitter} from 'eventemitter3';
 import {Configuration} from './Configuration';
 import {LocalStorageManager, SessionStorageManager, NoopManager} from './persistance/DefaultStorages';
 import {PersistanceManager, isTimestampedValue, TimestampedValue} from './persistance/PersistanceManager';
-import {PromiseAndTimestamp } from './util/dtos';
+import {PromiseAndTimestamp} from './util/dtos';
 
 
 const defaultCfg : Configuration<any> = {
@@ -44,9 +44,7 @@ export class LoadNCache<T> extends EventEmitter {
      * Initialize the object with given setting.
      * @param {any} cfg Instance settings or a load function.
      */
-    constructor(cfg : Configuration<T>)
-    constructor(cfg : ()=> Promise<T>)
-    constructor(cfg : any) {
+    constructor(cfg : Configuration<T> | (()=> Promise<T>)) {
         super();
 
         this.config = Object.assign({}, defaultCfg, typeof cfg === 'function' ? {loader: cfg} : cfg);
@@ -58,16 +56,15 @@ export class LoadNCache<T> extends EventEmitter {
         // Resolve persistance manager if a name was given.
         if (typeof this.config.persistance === 'string') {
             const pm = defaultPersistanceManagers[this.config.persistance];
-            const pmKey  = this.config.persistanceKey;
+            const pmKey = this.config.persistanceKey;
             if (pm && pmKey) {
                 this.persistanceManager = pm(pmKey);
-            }
-            else{
+            } else {
                 console.error(`Unknown persistance manager requested (${this.config.persistance}) ` +
                                 `or empty persistanceKey. Defaulting to Noop.`);
                 this.persistanceManager = new NoopManager();
             }
-        }else{
+        } else {
             this.persistanceManager = this.config.persistance as PersistanceManager<T>;
         }
     }
@@ -75,32 +72,33 @@ export class LoadNCache<T> extends EventEmitter {
     /**
      * Prepare the auto flush according to configuration. If this feature
      * is disabled by configuration this method does nothing.
+     * @param {number} fetchTs When was the value fetched.
      */
-    private setupAutoflush(fetchTs: number){
+    private setupAutoflush(fetchTs: number) {
         const ttl = this.computeTtl(fetchTs!);
         if (ttl === Infinity)
             return;
 
-        if (ttl <= 0){
+        if (ttl <= 0) {
             // Should already be flushed!
             this.flush();
-        }
-        else{
+        } else {
             setTimeout(() => this.flush(), ttl);
         }
     }
 
     /**
-     * This method computes how long a value fetched at the given timestamp 
-     * has left to live according to the configuration. If autoflush is 
+     * This method computes how long a value fetched at the given timestamp
+     * has left to live according to the configuration. If autoflush is
      * disable this method always returns Infinity.
-     * @returns Infinity if the value should not autoexpire, a positive number if it still 
+     * @param {number} timestamp The timestamp to inspect
+     * @return {number} Infinity if the value should not autoexpire, a positive number if it still
      * valid, 0 or negative if it is expired.
      */
-    private computeTtl(timestamp: number){
+    private computeTtl(timestamp: number) {
         if (!this.config.autoFlushTime || this.config.autoFlushTime < 0)
             return Infinity;
-        
+
         const now = new Date().getTime();
         const flushAt = timestamp + this.config.autoFlushTime;
         return flushAt - now;
@@ -108,13 +106,13 @@ export class LoadNCache<T> extends EventEmitter {
 
     /**
      * Calls the saveValue() method and handle errors.
-     * @param val The value 
+     * @param {TimestampedValue<T>} val The value
      */
-    private async persistData(val: TimestampedValue<T>){
-        try{
+    private async persistData(val: TimestampedValue<T>) {
+        try {
             await this.persistanceManager.saveValue(val);
-        }catch(err){
-            console.warn("Persistance error while saving data: ", err);
+        } catch (err) {
+            console.warn('Persistance error while saving data: ', err);
         }
     }
 
@@ -122,7 +120,7 @@ export class LoadNCache<T> extends EventEmitter {
      * Invoke the loadFunction ensuring that its returned value is a promise.
      * The check is ensured implicitly by using the async qualifier.
      */
-    private async callLoadFunction(){
+    private async callLoadFunction() {
         return this.config.loader!();
     }
 
@@ -131,46 +129,42 @@ export class LoadNCache<T> extends EventEmitter {
      * As soon as the value is available (which can be also a rejected promise) its
      * stored as a promise along with the timestamp.
      */
-    private async loadNewValue() : Promise<PromiseAndTimestamp<T>>{
-
-        if (this.firstLoad){
-            try{
+    private async loadNewValue() : Promise<PromiseAndTimestamp<T>> {
+        if (this.firstLoad) {
+            try {
                 const val = await this.persistanceManager.loadValue();
-                
+
                 // If val is not the type of object we expect we ignore it. This
                 // is also the case when no value was found.
-                if (isTimestampedValue(val)){
-                    if (this.computeTtl(val.ts) > 0){
-                        return {ts : val.ts, promise: Promise.resolve(val.value)};
+                if (isTimestampedValue(val)) {
+                    if (this.computeTtl(val.ts) > 0) {
+                        return {ts: val.ts, promise: Promise.resolve(val.value)};
                     }
                 }
-                    
-
-            } catch(err) {
+            } catch (err) {
                 // If we have an error we print it for the sake of debugging but
-                // no further actions are required.   
-                if (err) 
-                    console.warn("Persistance error while loading value.", err);
+                // no further actions are required.
+                if (err)
+                    console.warn('Persistance error while loading value.', err);
             }
         }
 
         // We need to call the loading function.
         let promise : Promise<T>;
         let ts;
-        try{
+        try {
             // Resolved promise handling
             const value = await this.callLoadFunction();
             promise = Promise.resolve(value);
             ts = new Date().getTime();
             await this.persistData({ts, value});
-        }
-        catch(err){
+        } catch (err) {
             // Rejected promises
             promise = Promise.reject(err);
             ts = new Date().getTime();
         }
 
-        return {ts, promise : promise!};
+        return {ts, promise: promise!};
     }
 
     /**
@@ -178,8 +172,8 @@ export class LoadNCache<T> extends EventEmitter {
      * or a stored one.
      * @return {Promise} A promise that will be resolved with the value or reject if fetching fails.
      */
-    public get(){
-        if (!this.promise){
+    public get() {
+        if (!this.promise) {
             if (!this.config.disableEvents)
                 this.emit('before-load', this);
 
@@ -192,8 +186,8 @@ export class LoadNCache<T> extends EventEmitter {
                 return pnt.promise;
             });
         }
-            
-        
+
+
         return this.promise;
     }
 
@@ -205,14 +199,13 @@ export class LoadNCache<T> extends EventEmitter {
             this.emit('before-flush', this);
 
         this.promise = undefined;
-        try{
+        try {
             this.persistanceManager.clear();
+        } catch (err) {
+            console.warn('Persistance error while flushing value.', err);
         }
-        catch(err){
-            console.warn("Persistance error while flushing value.", err);
-        }
-        
-        
+
+
         if (!this.config.disableEvents)
             this.emit('after-flush', this);
     }

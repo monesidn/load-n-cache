@@ -1,3 +1,4 @@
+/* eslint-disable prefer-promise-reject-errors */
 import {LoadNCache} from '../src';
 
 /**
@@ -5,7 +6,7 @@ import {LoadNCache} from '../src';
  */
 
 test('Basic functionality with loadFunction only.', async () => {
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res('Hello World'), 500)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 500)));
     const lnc = new LoadNCache(mockFn);
 
     const results = await Promise.all([lnc.get(), lnc.get(), lnc.get()]);
@@ -14,7 +15,7 @@ test('Basic functionality with loadFunction only.', async () => {
 });
 
 test('Basic functionality with no additional options.', async () => {
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res('Hello World'), 500)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 500)));
     const lnc = new LoadNCache({loader: mockFn});
 
     const results = await Promise.all([lnc.get(), lnc.get(), lnc.get()]);
@@ -32,11 +33,11 @@ test('Basic functionality with rejected promise.', async () => {
 });
 
 test('Throws on missing load function.', () => {
-    expect(() => { new LoadNCache({}) }).toThrow(Error);
+    expect(() => new LoadNCache({})).toThrow(Error);
 });
 
 test('Caching null.', async () => {
-    const mockFn = jest.fn(() => new Promise<null>((res) => {setTimeout(() => res(null), 500)}));
+    const mockFn = jest.fn(() => new Promise<null>((res) => setTimeout(() => res(null), 500)));
     const lnc = new LoadNCache(mockFn);
 
     const results = await Promise.all([lnc.get(), lnc.get(), lnc.get()]);
@@ -45,7 +46,7 @@ test('Caching null.', async () => {
 });
 
 test('Caching undefined.', async () => {
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(undefined), 500)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(undefined), 500)));
     const lnc = new LoadNCache(mockFn);
 
     const results = await Promise.all([lnc.get(), lnc.get(), lnc.get()]);
@@ -56,24 +57,24 @@ test('Caching undefined.', async () => {
 
 test('Autoflush works as expected.', async () => {
     let counter = 0;
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(`Hello World ${++counter}`), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(`Hello World ${++counter}`), 100)));
     const lnc = new LoadNCache({loader: mockFn, autoFlushTime: 300});
 
     let value = await lnc.get();
-    expect(value).toBe("Hello World 1");
+    expect(value).toBe('Hello World 1');
 
     value = await lnc.get();
-    expect(value).toBe("Hello World 1");
+    expect(value).toBe('Hello World 1');
 
     lnc.flush();
 
     value = await lnc.get();
-    expect(value).toBe("Hello World 2");
+    expect(value).toBe('Hello World 2');
 
     await new Promise((res) => setTimeout(res, 500));
 
     value = await lnc.get();
-    expect(value).toBe("Hello World 3");
+    expect(value).toBe('Hello World 3');
 
     expect(mockFn.mock.calls.length).toBe(3);
 });

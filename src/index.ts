@@ -1,3 +1,4 @@
 
 export {LoadNCache} from './LoadNCache';
-export {PersistanceManager} from './persistance/PersistanceManager';
+export {Configuration} from './Configuration';
+export {PersistanceManager, TimestampedValue} from './persistance/PersistanceManager';

@@ -1,14 +1,12 @@
-import { LoadNCache } from "../src";
-import { NoopManager } from "../src/persistance/DefaultStorages";
+import {LoadNCache} from '../src';
+import {NoopManager} from '../src/persistance/DefaultStorages';
 
-
-  
 
 test('Persistance: store a value into sessionStorage.', async () => {
     const randVal = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
 
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -32,11 +30,11 @@ test('Persistance: unknown storage defaults to Noop.', async () => {
         info: jest.fn(),
         warn: jest.fn(),
         error: jest.fn()
-    }
+    };
 
     const randVal = `Hello World ${Math.random()}`;
 
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'fooBar'
@@ -50,7 +48,7 @@ test('Persistance: store "null" into sessionStorage.', async () => {
     sessionStorage.clear();
     const persistanceKey = 'test';
 
-    const mockFn = jest.fn(() => new Promise<any>((res) => {setTimeout(() => res(null), 100)}));
+    const mockFn = jest.fn(() => new Promise<any>((res) => setTimeout(() => res(null), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -72,7 +70,7 @@ test('Persistance: store "undefined" into sessionStorage.', async () => {
     sessionStorage.clear();
     const persistanceKey = 'test';
 
-    const mockFn = jest.fn(() => new Promise<any>((res) => {setTimeout(() => res(undefined), 100)}));
+    const mockFn = jest.fn(() => new Promise<any>((res) => setTimeout(() => res(undefined), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -96,8 +94,8 @@ test('Persistance: restore a value from sessionStorage.', async () => {
     const json = {ts: 0, value: randVal};
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -114,8 +112,8 @@ test('Persistance: restore "null" from sessionStorage.', async () => {
     const json = {ts: 0, value: null};
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res("Hello World"), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -132,8 +130,8 @@ test('Persistance: restore "undefined" from sessionStorage.', async () => {
     const json = {ts: 0, value: undefined};
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res("Hello World"), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -152,8 +150,8 @@ test('Persistance: autoflush an expired value from sessionStorage.', async () =>
     const json = {ts: 0, value: randVal};
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal2), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal2), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -173,8 +171,8 @@ test('Persistance: autoflush of a soon to expire value from sessionStorage.', as
     const json = {ts: new Date().getTime()-100, value: randVal};
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal2), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal2), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'sessionStorage',
@@ -200,7 +198,7 @@ test('Persistance: store a value into localStorage.', async () => {
     const randVal = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
 
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -222,7 +220,7 @@ test('Persistance: store "null" into localStorage.', async () => {
     localStorage.clear();
     const persistanceKey = 'test';
 
-    const mockFn = jest.fn(() => new Promise<any>((res) => {setTimeout(() => res(null), 100)}));
+    const mockFn = jest.fn(() => new Promise<any>((res) => setTimeout(() => res(null), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -244,7 +242,7 @@ test('Persistance: store "undefined" into localStorage.', async () => {
     localStorage.clear();
     const persistanceKey = 'test';
 
-    const mockFn = jest.fn(() => new Promise<any>((res) => {setTimeout(() => res(undefined), 100)}));
+    const mockFn = jest.fn(() => new Promise<any>((res) => setTimeout(() => res(undefined), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -268,8 +266,8 @@ test('Persistance: restore a value from localStorage.', async () => {
     const json = {ts: 0, value: randVal};
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -286,8 +284,8 @@ test('Persistance: restore "null" from localStorage.', async () => {
     const json = {ts: 0, value: null};
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res("Hello World"), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -304,8 +302,8 @@ test('Persistance: restore "undefined" from localStorage.', async () => {
     const json = {ts: 0, value: undefined};
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res("Hello World"), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -324,8 +322,8 @@ test('Persistance: autoflush an expired value from localStorage.', async () => {
     const json = {ts: 0, value: randVal};
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal2), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal2), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -345,8 +343,8 @@ test('Persistance: autoflush of a soon to expire value from localStorage.', asyn
     const json = {ts: new Date().getTime()-100, value: randVal};
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal2), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal2), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: 'localStorage',
@@ -366,35 +364,34 @@ test('Persistance: autoflush of a soon to expire value from localStorage.', asyn
 });
 
 test('Persistance: error loading value is handled right.', async () => {
-
     (global.console as any) = {
         log: jest.fn(),
         info: jest.fn(),
         warn: jest.fn(),
         error: jest.fn()
-    }
+    };
 
     const badStorage = {
-        loadValue : jest.fn(() => {
-            throw new Error("Mock error while loading.");
+        loadValue: jest.fn(() => {
+            throw new Error('Mock error while loading.');
         }),
-        saveValue : jest.fn(() => {
-            throw new Error("Mock error while saving.");
+        saveValue: jest.fn(() => {
+            throw new Error('Mock error while saving.');
         }),
-        clear : jest.fn(() => {
-            throw new Error("Mock error while flushing.");
+        clear: jest.fn(() => {
+            throw new Error('Mock error while flushing.');
         })
-    }
+    };
 
     const randVal = `Hello World ${Math.random()}`;
-    
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res(randVal), 100)}));
+
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(randVal), 100)));
     const lnc = new LoadNCache({
         loader: mockFn,
         persistance: badStorage
     });
 
-    let value = await lnc.get();
+    const value = await lnc.get();
     expect(value).toBe(randVal);
     expect(mockFn).toBeCalled();
     expect(badStorage.loadValue).toBeCalled();
@@ -404,5 +401,4 @@ test('Persistance: error loading value is handled right.', async () => {
     lnc.flush();
     expect(badStorage.clear).toBeCalled();
     expect(console.warn).toBeCalledTimes(3);
-
 });

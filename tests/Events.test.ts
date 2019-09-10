@@ -4,14 +4,14 @@ import {LoadNCache} from '../src';
  * Events test suite.
  */
 test('Check events flow on load.', async () => {
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res('Hello World'), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache(mockFn);
 
     const beforeLoad = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).toBe(undefined);
     });
-    const afterLoad  = jest.fn((arg) => {
+    const afterLoad = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).not.toBe(undefined);
     });
@@ -23,7 +23,7 @@ test('Check events flow on load.', async () => {
         expect(beforeLoad.mock.calls.length).toBe(1);
         expect(afterLoad.mock.calls.length).toBe(1);
     });
-    
+
     expect(beforeLoad.mock.calls.length).toBe(1);
     expect(afterLoad.mock.calls.length).toBe(0);
 
@@ -31,14 +31,14 @@ test('Check events flow on load.', async () => {
 });
 
 test('Check events flow on load, flush, load.', async () => {
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res('Hello World'), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache(mockFn);
-    
+
     const beforeLoad = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).toBe(undefined);
     });
-    const afterLoad  = jest.fn((arg) => {
+    const afterLoad = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).not.toBe(undefined);
     });
@@ -46,7 +46,7 @@ test('Check events flow on load, flush, load.', async () => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).not.toBe(undefined);
     });
-    const afterFlush  = jest.fn((arg) => {
+    const afterFlush = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).toBe(undefined);
     });
@@ -63,14 +63,14 @@ test('Check events flow on load, flush, load.', async () => {
         expect(beforeFlush.mock.calls.length).toBe(0);
         expect(afterFlush.mock.calls.length).toBe(0);
     });
-    
+
     expect(beforeLoad.mock.calls.length).toBe(1);
     expect(afterLoad.mock.calls.length).toBe(0);
     expect(beforeFlush.mock.calls.length).toBe(0);
     expect(afterFlush.mock.calls.length).toBe(0);
 
     await promise;
-    
+
     lnc.flush();
 
     expect(beforeLoad.mock.calls.length).toBe(1);
@@ -93,14 +93,14 @@ test('Check events flow on load, flush, load.', async () => {
 
 
 test('Check events flow on load, refresh.', async () => {
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res('Hello World'), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache(mockFn);
-    
+
     const beforeLoad = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).toBe(undefined);
     });
-    const afterLoad  = jest.fn((arg) => {
+    const afterLoad = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).not.toBe(undefined);
     });
@@ -108,7 +108,7 @@ test('Check events flow on load, refresh.', async () => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).not.toBe(undefined);
     });
-    const afterFlush  = jest.fn((arg) => {
+    const afterFlush = jest.fn((arg) => {
         expect(arg === lnc).toBe(true);
         expect((lnc as any).promise).toBe(undefined);
     });
@@ -125,7 +125,7 @@ test('Check events flow on load, refresh.', async () => {
         expect(beforeFlush.mock.calls.length).toBe(0);
         expect(afterFlush.mock.calls.length).toBe(0);
     });
-    
+
     expect(beforeLoad.mock.calls.length).toBe(1);
     expect(afterLoad.mock.calls.length).toBe(0);
     expect(beforeFlush.mock.calls.length).toBe(0);
@@ -148,11 +148,11 @@ test('Check events flow on load, refresh.', async () => {
 
 test('Check events not firing when disabled.', async () => {
     const beforeLoad = jest.fn();
-    const afterLoad  = jest.fn();
+    const afterLoad = jest.fn();
     const beforeFlush = jest.fn();
-    const afterFlush  = jest.fn();
+    const afterFlush = jest.fn();
 
-    const mockFn = jest.fn(() => new Promise((res) => {setTimeout(() => res('Hello World'), 100)}));
+    const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
     const lnc = new LoadNCache({loader: mockFn, disableEvents: true});
 
     lnc.on('before-load', beforeLoad);
