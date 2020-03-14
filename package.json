@@ -2,6 +2,10 @@
   "name": "load-n-cache",
   "version": "1.0.0",
   "description": "Helps developers to cache slowly changing resources",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/monesidn/load-n-cache"
+  },
   "main": "dist/index.js",
   "scripts": {
     "test": "node node_modules/jest/bin/jest.js"
@@ -9,14 +13,15 @@
   "author": "Daniele Monesi",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^24.0.18",
-    "@typescript-eslint/eslint-plugin": "^2.1.0",
-    "@typescript-eslint/parser": "^2.1.0",
-    "eslint": "^6.3.0",
+    "@types/jest": "^25.1.0",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
+    "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
-    "jest": "^24.9.0",
+    "jest": "^25.1.0",
     "jest-localstorage-mock": "^2.4.0",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^25.1.0",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "eventemitter3": "^4.0.0"

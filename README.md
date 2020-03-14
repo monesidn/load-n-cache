@@ -46,16 +46,16 @@ The LoadNCache object will take care of:
 * emit events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
 
 ## In depth Documentation
-LoadNCache is a class that is only responsible for calling a "loadFunction" at the right moment and storing the returned value for the future. Each class instance can be configured to work in a different way so data can be stored using the righe policy. For example the following are all use cases that can be easily implemented using LoadNCache:
-* Load user data and store them for up to 10 minutes.
+LoadNCache is a class that is only responsible for calling a "loadFunction" at the right moment and then store the returned value for the future. Each class instance can be configured to work in a different way so data can be stored using the right policy. The following are all use cases that can be easily implemented using LoadNCache:
+* Load user data and store them for up to 10 hours, minutes or seconds.
 * Load action available and store them on localStorage so after refreshing the page data are not downloaded again.
 * Perform some CPU intensive task and store the result to avoid computing the value again.
 * Load a short-lived value from the server only if it is actually needed, like the server date and time. 
 
 ### What is a "loadFunction"?
-As the names goes it is a javascript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
+As the names goes it's a javascript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
 The return value of the loadFunction is handled as follows
-* if it is undefined, null or any other value, expect for Promises, it is wrapped into a resolved promise and stored;
+* if it is undefined, null or any other value, except for Promises, it is wrapped into a resolved promise and stored;
 * If it is a Promise the value is stored as is.
 The loadFunction should be stateless as it may be called immediatly, in the future or never. 
 
@@ -102,7 +102,7 @@ Only promises fulfilled are persisted using the persistance manager. Rejected pr
 
 ### Autoflush is relative to promise resolution/rejection
 The autoflush time is measured starting at promise resolution or rejection. So if 5000ms are configured and promise resolution took 60000ms then the .flush() method will be called after 65000ms.
-Also remember that the autoflush is subject to small delay due to javascript event queue. 
+Also remember that the autoflush may be subject to short delays due to javascript event queue. 
 
 ## Recipes
 ### Load user data and store them for up to 10 minutes.

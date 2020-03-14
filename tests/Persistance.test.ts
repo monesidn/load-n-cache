@@ -25,12 +25,10 @@ test('Persistance: store a value into sessionStorage.', async () => {
 });
 
 test('Persistance: unknown storage defaults to Noop.', async () => {
-    (global.console as any) = {
-        log: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
-    };
+    console.log = jest.fn();
+    console.info = jest.fn();
+    console.warn = jest.fn();
+    console.error = jest.fn();
 
     const randVal = `Hello World ${Math.random()}`;
 
@@ -364,12 +362,10 @@ test('Persistance: autoflush of a soon to expire value from localStorage.', asyn
 });
 
 test('Persistance: error loading value is handled right.', async () => {
-    (global.console as any) = {
-        log: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
-    };
+    console.log = jest.fn();
+    console.info = jest.fn();
+    console.warn = jest.fn();
+    console.error = jest.fn();
 
     const badStorage = {
         loadValue: jest.fn(() => {
