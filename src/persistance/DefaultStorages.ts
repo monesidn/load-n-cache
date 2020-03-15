@@ -1,4 +1,5 @@
-import {PersistanceManager, TimestampedValue} from './PersistanceManager';
+import { PersistanceManager } from './PersistanceManager';
+import { TimestampedValue } from '../util/TimestampedValue';
 
 /**
  * Simple root class for both localStorage and sessionStorage.
@@ -17,6 +18,7 @@ class BasicBrowserStorage implements PersistanceManager<any> {
      */
     saveValue(value: TimestampedValue<any>): Promise<any> {
         try {
+            debugger;
             this.storage.setItem(this.key, JSON.stringify(value));
             return Promise.resolve();
         } catch (ex) {
@@ -27,6 +29,7 @@ class BasicBrowserStorage implements PersistanceManager<any> {
      * @return {Promise} a Promise containing the loaded value.
      */
     async loadValue(): Promise<any> {
+        debugger;
         const data = this.storage.getItem(this.key);
         if (!data) return;
         return JSON.parse(data!);

@@ -15,7 +15,7 @@
     "prestart": "npm run build",
     "start": "node dist/index.js",
     "clean": "rimraf dist && npm run test",
-    "prepare": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "author": "Daniele Monesi",
   "license": "ISC",

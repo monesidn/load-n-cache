@@ -1,5 +1,5 @@
 /* eslint-disable prefer-promise-reject-errors */
-import {LoadNCache} from '../src';
+import { LoadNCache } from '../src';
 
 /**
  * Basic functionality test suite.
@@ -16,7 +16,7 @@ test('Basic functionality with loadFunction only.', async () => {
 
 test('Basic functionality with no additional options.', async () => {
     const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 500)));
-    const lnc = new LoadNCache({loader: mockFn});
+    const lnc = new LoadNCache({ loader: mockFn });
 
     const results = await Promise.all([lnc.get(), lnc.get(), lnc.get()]);
     expect(mockFn.mock.calls.length).toBe(1);
@@ -58,7 +58,7 @@ test('Caching undefined.', async () => {
 test('Autoflush works as expected.', async () => {
     let counter = 0;
     const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res(`Hello World ${++counter}`), 100)));
-    const lnc = new LoadNCache({loader: mockFn, autoFlushTime: 300});
+    const lnc = new LoadNCache({ loader: mockFn, autoFlush: 300 });
 
     let value = await lnc.get();
     expect(value).toBe('Hello World 1');

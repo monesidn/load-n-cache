@@ -1,4 +1,4 @@
-import {LoadNCache} from '../src';
+import { LoadNCache } from '../src';
 
 /**
  * Events test suite.
@@ -71,7 +71,7 @@ test('Check events flow on load, flush, load.', async () => {
 
     await promise;
 
-    lnc.flush();
+    await lnc.flush();
 
     expect(beforeLoad.mock.calls.length).toBe(1);
     expect(afterLoad.mock.calls.length).toBe(1);
@@ -140,10 +140,10 @@ test('Check events flow on load, refresh.', async () => {
         expect(afterFlush.mock.calls.length).toBe(1);
     });
 
-    expect(beforeLoad.mock.calls.length).toBe(2);
+    expect(beforeLoad.mock.calls.length).toBe(1);
     expect(afterLoad.mock.calls.length).toBe(1);
     expect(beforeFlush.mock.calls.length).toBe(1);
-    expect(afterFlush.mock.calls.length).toBe(1);
+    expect(afterFlush.mock.calls.length).toBe(0);
 });
 
 test('Check events not firing when disabled.', async () => {
@@ -153,7 +153,7 @@ test('Check events not firing when disabled.', async () => {
     const afterFlush = jest.fn();
 
     const mockFn = jest.fn(() => new Promise((res) => setTimeout(() => res('Hello World'), 100)));
-    const lnc = new LoadNCache({loader: mockFn, disableEvents: true});
+    const lnc = new LoadNCache({ loader: mockFn, disableEvents: true });
 
     lnc.on('before-load', beforeLoad);
     lnc.on('after-load', afterLoad);
@@ -161,7 +161,7 @@ test('Check events not firing when disabled.', async () => {
     lnc.on('after-flush', afterFlush);
 
     await lnc.get();
-    lnc.flush();
+    await lnc.flush();
     await lnc.get();
 
     expect(beforeLoad.mock.calls.length).toBe(0);

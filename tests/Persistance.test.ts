@@ -1,5 +1,5 @@
-import {LoadNCache} from '../src';
-import {NoopManager} from '../src/persistance/DefaultStorages';
+import { LoadNCache } from '../src';
+import { NoopManager } from '../src/persistance/DefaultStorages';
 
 
 test('Persistance: store a value into sessionStorage.', async () => {
@@ -43,6 +43,7 @@ test('Persistance: unknown storage defaults to Noop.', async () => {
 });
 
 test('Persistance: store "null" into sessionStorage.', async () => {
+    debugger;
     sessionStorage.clear();
     const persistanceKey = 'test';
 
@@ -89,7 +90,7 @@ test('Persistance: store "undefined" into sessionStorage.', async () => {
 test('Persistance: restore a value from sessionStorage.', async () => {
     const randVal = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
-    const json = {ts: 0, value: randVal};
+    const json = { ts: 0, value: randVal };
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -107,7 +108,7 @@ test('Persistance: restore a value from sessionStorage.', async () => {
 
 test('Persistance: restore "null" from sessionStorage.', async () => {
     const persistanceKey = 'test';
-    const json = {ts: 0, value: null};
+    const json = { ts: 0, value: null };
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -125,7 +126,7 @@ test('Persistance: restore "null" from sessionStorage.', async () => {
 
 test('Persistance: restore "undefined" from sessionStorage.', async () => {
     const persistanceKey = 'test';
-    const json = {ts: 0, value: undefined};
+    const json = { ts: 0, value: undefined };
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -145,7 +146,7 @@ test('Persistance: autoflush an expired value from sessionStorage.', async () =>
     const randVal = `Hello World ${Math.random()}`;
     const randVal2 = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
-    const json = {ts: 0, value: randVal};
+    const json = { ts: 0, value: randVal };
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -154,7 +155,7 @@ test('Persistance: autoflush an expired value from sessionStorage.', async () =>
         loader: mockFn,
         persistance: 'sessionStorage',
         persistanceKey,
-        autoFlushTime: 1000
+        autoFlush: 1000
     });
 
     const value = await lnc.get();
@@ -166,7 +167,7 @@ test('Persistance: autoflush of a soon to expire value from sessionStorage.', as
     const randVal = `Hello World ${Math.random()}`;
     const randVal2 = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
-    const json = {ts: new Date().getTime()-100, value: randVal};
+    const json = { ts: new Date().getTime()-100, value: randVal };
 
     sessionStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -175,7 +176,7 @@ test('Persistance: autoflush of a soon to expire value from sessionStorage.', as
         loader: mockFn,
         persistance: 'sessionStorage',
         persistanceKey,
-        autoFlushTime: 300
+        autoFlush: 300
     });
 
     let value = await lnc.get();
@@ -261,7 +262,7 @@ test('Persistance: store "undefined" into localStorage.', async () => {
 test('Persistance: restore a value from localStorage.', async () => {
     const randVal = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
-    const json = {ts: 0, value: randVal};
+    const json = { ts: 0, value: randVal };
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -279,7 +280,7 @@ test('Persistance: restore a value from localStorage.', async () => {
 
 test('Persistance: restore "null" from localStorage.', async () => {
     const persistanceKey = 'test';
-    const json = {ts: 0, value: null};
+    const json = { ts: 0, value: null };
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -297,7 +298,7 @@ test('Persistance: restore "null" from localStorage.', async () => {
 
 test('Persistance: restore "undefined" from localStorage.', async () => {
     const persistanceKey = 'test';
-    const json = {ts: 0, value: undefined};
+    const json = { ts: 0, value: undefined };
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -317,7 +318,7 @@ test('Persistance: autoflush an expired value from localStorage.', async () => {
     const randVal = `Hello World ${Math.random()}`;
     const randVal2 = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
-    const json = {ts: 0, value: randVal};
+    const json = { ts: 0, value: randVal };
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -326,7 +327,7 @@ test('Persistance: autoflush an expired value from localStorage.', async () => {
         loader: mockFn,
         persistance: 'localStorage',
         persistanceKey,
-        autoFlushTime: 1000
+        autoFlush: 1000
     });
 
     const value = await lnc.get();
@@ -338,7 +339,7 @@ test('Persistance: autoflush of a soon to expire value from localStorage.', asyn
     const randVal = `Hello World ${Math.random()}`;
     const randVal2 = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
-    const json = {ts: new Date().getTime()-100, value: randVal};
+    const json = { ts: new Date().getTime()-100, value: randVal };
 
     localStorage.setItem(persistanceKey, JSON.stringify(json));
 
@@ -347,7 +348,7 @@ test('Persistance: autoflush of a soon to expire value from localStorage.', asyn
         loader: mockFn,
         persistance: 'localStorage',
         persistanceKey,
-        autoFlushTime: 300
+        autoFlush: 300
     });
 
     let value = await lnc.get();

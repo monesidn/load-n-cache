@@ -84,6 +84,13 @@ Invalidate the currently cached value if any. If no value is cached then this me
 #### .refresh()
 Shortcut for calling `.flush()` and `.get()`. Returns the promise from `.get()`.
 
+### About persistance
+
+As stated above when you want to allow your data to survive across reloads you need to persist them. Out of the box this library provide only 2 very trivial strategies to achieve this result: `localStorage` and `sessionStorage`.
+If you need to store "pure" JSON object not too large these two implementation may be enough. Many projects however will require a more complex approach, to solve this issue provide an implementation of "PersistanceManager". Below there is an example that
+will use custom logic to retrieve objects from storage.
+
+
 ### LoadNCache events
 You are able to react to status changes listening to the following events:
 * *before-load*: the instance is about to call the loadFunction to fetch a new promise. No promise currently cached.
@@ -103,6 +110,11 @@ Only promises fulfilled are persisted using the persistance manager. Rejected pr
 ### Autoflush is relative to promise resolution/rejection
 The autoflush time is measured starting at promise resolution or rejection. So if 5000ms are configured and promise resolution took 60000ms then the .flush() method will be called after 65000ms.
 Also remember that the autoflush may be subject to short delays due to javascript event queue. 
+
+## Examples
+I've created an angular 9 project to show what this library can do with few lines of codes. You can find it here:
+XXXXXXXXXXXXx
+Also you can play with the related stackblitz. Have fun! 
 
 ## Recipes
 ### Load user data and store them for up to 10 minutes.

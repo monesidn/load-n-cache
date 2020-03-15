@@ -1,4 +1,5 @@
-import {PersistanceManager} from './persistance/PersistanceManager';
+import { PersistanceManager } from './persistance/PersistanceManager';
+import { AutoflushManager } from './autoflush/AutoflushManager';
 
 export interface Configuration<T>{
     /**
@@ -12,11 +13,13 @@ export interface Configuration<T>{
     disableEvents?: boolean;
 
     /**
-     * How long (in millis) the value should be kept. As soon as time elapsed
-     * an automatic call to .flush() is executed. Setting it to 0 or a negative
-     * value disable this feature. Defaults to 0.
+     * This configuration can be provided in two ways:
+     * - Passing a number will specify how long (in millis) the value should be kept.
+     * As soon as time elapsed an automatic call to .flush() is executed.
+     * - Passing a flushFn that will be called each time a new value is fetched.
+     * Omitting this value or setting it to a value <= 0 will disable `autoFlush` entirely.
      */
-    autoFlushTime?: number;
+    autoFlush?: number | AutoflushManager<T>;
 
     /**
      * Specify the persistance method to use. You can supply a string that identify one
