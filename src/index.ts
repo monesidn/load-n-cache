@@ -4,3 +4,4 @@ export { Configuration } from './Configuration';
 export { PersistanceManager } from './persistance/PersistanceManager';
 export { AutoflushManager } from './autoflush/AutoflushManager';
 export { TimestampedValue } from './util/TimestampedValue';
+export { PromiseWithMetadata } from './util/PromiseWithMetadata';

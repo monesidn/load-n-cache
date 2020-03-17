@@ -3,6 +3,7 @@ import { NoopManager } from '../src/persistance/DefaultStorages';
 
 
 test('Persistance: store a value into sessionStorage.', async () => {
+    sessionStorage.clear();
     const randVal = `Hello World ${Math.random()}`;
     const persistanceKey = 'test';
 
@@ -25,6 +26,7 @@ test('Persistance: store a value into sessionStorage.', async () => {
 });
 
 test('Persistance: unknown storage defaults to Noop.', async () => {
+    sessionStorage.clear();
     console.log = jest.fn();
     console.info = jest.fn();
     console.warn = jest.fn();
@@ -43,7 +45,6 @@ test('Persistance: unknown storage defaults to Noop.', async () => {
 });
 
 test('Persistance: store "null" into sessionStorage.', async () => {
-    debugger;
     sessionStorage.clear();
     const persistanceKey = 'test';
 

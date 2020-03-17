@@ -1,4 +1,3 @@
-import { TimestampedValue } from '../util/TimestampedValue';
 import { PromiseWithMetadata } from '../util/PromiseWithMetadata';
 
 
@@ -14,7 +13,7 @@ export interface AutoflushManager<T> {
      * method return resolve to true the `fetched` method will be called.
      * @param value
      */
-    isExpired(value: TimestampedValue<T>): Promise<boolean>;
+    isExpired(value: PromiseWithMetadata<T>): Promise<boolean>;
 
     /**
      * Every time a new value is fetched this method will be called. When the

@@ -77,8 +77,10 @@ export class LoadNCache<T> extends EventEmitter {
                     `or empty persistanceKey. Defaulting to Noop.`);
                 this.persistanceManager = new NoopManager();
             }
-        } else {
+        } else if (this.config.persistance) {
             this.persistanceManager = this.config.persistance as PersistanceManager<T>;
+        } else {
+            this.persistanceManager = new NoopManager();
         }
 
         // Resolve autoflush manager when a number is passed.
@@ -116,12 +118,13 @@ export class LoadNCache<T> extends EventEmitter {
                 // If val is not the type of object we expect or is already
                 // expired we'r going to ignore it.
                 if (isTimestampedValue(val)) {
+                    const metadata = await PromiseWithMetadata.from(val);
                     if (this.autoflushManager) {
-                        const expired = await this.autoflushManager.isExpired(val);
+                        const expired = await this.autoflushManager.isExpired(metadata);
                         if (!expired)
-                            return PromiseWithMetadata.from(val);
+                            return metadata;
                     } else {
-                        return PromiseWithMetadata.from(val);
+                        return metadata;
                     }
                 }
             } catch (err) {

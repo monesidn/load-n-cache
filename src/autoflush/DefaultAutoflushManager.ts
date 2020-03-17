@@ -32,8 +32,8 @@ export class DefaultAutoflushManager implements AutoflushManager<any> {
      * Performs a check on the timestamp.
      * @param {TimestampedValue} value
      */
-    async isExpired(value: TimestampedValue<any>) {
-        return this.computeTtl(value.ts) <= 0;
+    async isExpired(value: PromiseWithMetadata<any>) {
+        return this.computeTtl(value.completedAt) <= 0;
     }
 
 
