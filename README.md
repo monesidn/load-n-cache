@@ -1,12 +1,12 @@
 # Load 'n' Cache
 *Read it like "Rock 'n' roll" or "Lock 'n' load"*
 
-This is a simple library that I initially wrote while working on a large AngularJS application. The goal is to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user information for 10 minutes but it quickly become a corner stone of the project. 
+This is a simple library that I initially wrote while working on a large AngularJS application. The goal is to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user information for 10 minutes and then it  became a corner stone of the project. 
 
 Being this useful I thought it was a pity not to make it public and available for modern JavaScript frameworks. Enough said, I decided to rewrite it from scratch and make it freely available.
 
 ## The problem 
-As any other library this one solves a common problem, load a resource, the result of a REST service for instance, and make it available for subsequent calls without calling the service again or impacting calling code. Check the following code as an example of what **NOT TO DO**.
+As any other library this one solves a common problem: loading a resource and make it available for subsequent calls without calling the service again or impacting calling code. This is a typical problem when working with complex REST services. The following code is an example of what **NOT TO DO**.
  
 ```javascript
 var user;
@@ -22,10 +22,10 @@ function getUser() {
     return user;
 }
 ```
-The code above is loosely based on something I found in a production environment and has a lot of problems:
+The code above is loosely based on something I found in a production environment and have the following problems:
 1. Invoking getUser() multiple times may trigger multiple subsequent calls to the backend.
 1. You can never be sure if user is undefined because the backend did not worked or it's not loaded yet.
-You can improve this code by making wise usage of promises patterns but, as you take more scenarios into account, handling gets harder.
+You can improve this code by making wise usage of promises but, as you take more scenarios into account, handling gets harder.
 
 ## A simple yet powerful solution
 This library solves the above problems in a very easy-to-write way:
@@ -39,21 +39,21 @@ function getUser() {
 
 ```
 The LoadNCache object will take care of:
-* Call the provided "loadFunction" the first time the `get()` method is called;
-* call the function again if the cached value is invalidated (e.g. for an explicit call to `.flush()` or the configured "autoflush" occurred);
-* return the same promise over and over again, this mean that it is immediately resolved if the value was already fetched;
+* Call the provided "loadFunction" **only** the first time the `get()` method is called;
+* calling the function again if the cached value is invalidated (e.g. for an explicit call to `.flush()` or due to the configured "autoflush");
+* return the same promise over and over again, this mean that it is immediately resolved if the value is already on the client;
 * returning the same promise also mean that you can `.catch()` the error multiple times from different callers;
-* emit events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
+* emitting events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
 
 ## In depth Documentation
 LoadNCache is a class that is only responsible for calling a "loadFunction" at the right moment and then store the returned value for the future. Each class instance can be configured to work in a different way so data can be stored using the right policy. The following are all use cases that can be easily implemented using LoadNCache:
 * Load user data and store them for up to 10 hours, minutes or seconds.
-* Load action available and store them on localStorage so after refreshing the page data are not downloaded again.
-* Perform some CPU intensive task and store the result to avoid computing the value again.
+* Load action available and store them on localStorage (up to 2 hours) so after refreshing the page data are not downloaded again.
+* Perform some CPU intensive task and store the result to avoid computing again.
 * Load a short-lived value from the server only if it is actually needed, like the server date and time. 
 
 ### What is a "loadFunction"?
-As the names goes it's a JavaScript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
+As the name suggests, it's a JavaScript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
 The return value of the loadFunction is handled as follows
 * if it is undefined, null or any other value, except for Promises, it is wrapped into a resolved promise and stored;
 * If it is a Promise the value is stored as is.
@@ -68,11 +68,10 @@ The LoadNCache constructor accept an options object. If default options are ok f
 ##### Options
 * `loader: () => any`: the loadFunction. This is the only option that must be provided.
 * `disableEvents: boolean`: don't want events to be dispatched? Set this to true. Defaults to false.
-* `autoFlushTime: number`: how long (milliseconds) the value should be kept. As soon as time elapsed an automatic call to .flush() is executed. Setting it to 0 or a negative value disable this feature. Defaults to 0.
-* `persistance: string | PersistanceManager`: there are 2 supported string values:
+* `autoFlush: number | AutoflushManager`: specify the autoflush policy. It can be an object that implements a custom logic or a number. A number is handled like a time to live so, after a value is fetched, it is retained for up to ttl milliseconds. Setting this value to 0 or undefined disable this feature. 
+* `persistance: string | PersistanceManager`: specify how the value should be persisted. You can provide a custom `PersistanceManager` or use one of the provided implementation. To use a provided implementation pass one of the supported strings:
     * `localStorage`: the promise result is serialized as JSON and stored into localStorage. You must provide a storageKey option to specify the name of the localStorage key.
     * `sessionStorage`: the promise result is serialized as JSON and stored into sessionStorage. You must provide a storageKey option to specify the name of the sessionStorage key.
-    * Or you can provide your own PersistenceManager by implementing the interface. 
 * `persistanceKey: string`: if persisting on a default key-value storage (localStorage or sessionStorage) this option specify the key to use to store data.
 
 #### .get()
@@ -86,13 +85,13 @@ Shortcut for calling `.flush()` and `.get()`. Returns the promise from `.get()`.
 
 ### About persistence
 
-As stated above when you want to allow your data to survive across reloads you need to persist them. Out of the box this library provide only 2 very trivial strategies to achieve this result: `localStorage` and `sessionStorage`.
+As stated above when you want to allow your data to survive across page reloads you need to persist them. Out of the box this library provides only 2 very trivial strategies to achieve this result: `localStorage` and `sessionStorage`.
 If you need to store "pure" JSON object not too large these two implementation may be enough. Many projects however will require a more complex approach, to solve this issue provide an implementation of "PersistenceManager". Below there is an example that
 will use custom logic to retrieve objects from storage.
 
 
 ### LoadNCache events
-You are able to react to status changes listening to the following events:
+You can react to status changes listening to the following events:
 * *before-load*: the instance is about to call the loadFunction to fetch a new promise. No promise currently cached.
 * *after-load*: the instance has called the loaderFunction and a new promise is available. The event is fired after the promise resolves or reject.
 * *before-flush*: someone called the .flush() method. This is your last chance to do something before the current promise is removed and a new one will be created.
@@ -114,11 +113,11 @@ Also remember that the autoflush may be subject to short delays due to JavaScrip
 ## Examples
 I've created an angular 9 project to show what this library can do with few lines of codes. You can find it here:
 - https://github.com/monesidn/load-n-cache-test-app
-Also you can play with the related stackblitz. Have fun! 
+Also you can play with the related Stackblitz. Have fun! 
 - https://stackblitz.com/github/monesidn/load-n-cache-test-app
 
 ## Recipes
-### Load user data and store them for up to 10 minutes.
+### Load user data and stores them for up to 10 minutes.
 
 ```javascript
 class UserService{
@@ -136,7 +135,7 @@ class UserService{
 
 ```
 
-### Load action available and store them on localStorage.
+### Load actions available and stores them on localStorage.
 ```javascript
 class PrivilegeService{
     constructor(){
@@ -153,7 +152,7 @@ class PrivilegeService{
 }
 ```
 
-### Perform some CPU intensive task and store the result to avoid computing the value again.
+### Performs some CPU intensive task and stores the result to avoid computing the value again.
 ```javascript
 function heavyJob(){
     return new Promise((resolve) => setTimeout(resolve, 1000));
@@ -170,7 +169,7 @@ class TimeService{
     constructor(){
         this._serverTime = new LoadNCache({
            loader: () => fetch('/api/current-time').then(t => new Date(parseInt(t))),
-           autoFlushTime: 500
+           autoFlushTime: 50
         });
     }
 
