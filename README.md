@@ -45,6 +45,20 @@ The LoadNCache object will take care of:
 * returning the same promise also mean that you can `.catch()` the error multiple times from different callers;
 * emitting events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
 
+## Installation
+```
+npm install --save load-n-cache
+```
+and then you can:
+
+```typescript
+import { LoadNCache } from 'load-n-cache';
+```
+
+## RxJs
+- Q: "Wow cool, but I'm using Observables not promises"
+- A: Take a look at: https://github.com/monesidn/load-n-cache-rxjs
+
 ## In depth Documentation
 LoadNCache is a class that is only responsible for calling a "loadFunction" at the right moment and then store the returned value for the future. Each class instance can be configured to work in a different way so data can be stored using the right policy. The following are all use cases that can be easily implemented using LoadNCache:
 * Load user data and store them for up to 10 hours, minutes or seconds.
