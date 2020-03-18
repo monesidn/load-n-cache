@@ -84,10 +84,10 @@ Invalidate the currently cached value if any. If no value is cached then this me
 #### .refresh()
 Shortcut for calling `.flush()` and `.get()`. Returns the promise from `.get()`.
 
-### About persistance
+### About persistence
 
 As stated above when you want to allow your data to survive across reloads you need to persist them. Out of the box this library provide only 2 very trivial strategies to achieve this result: `localStorage` and `sessionStorage`.
-If you need to store "pure" JSON object not too large these two implementation may be enough. Many projects however will require a more complex approach, to solve this issue provide an implementation of "PersistanceManager". Below there is an example that
+If you need to store "pure" JSON object not too large these two implementation may be enough. Many projects however will require a more complex approach, to solve this issue provide an implementation of "PersistenceManager". Below there is an example that
 will use custom logic to retrieve objects from storage.
 
 
@@ -99,22 +99,23 @@ You are able to react to status changes listening to the following events:
 * *after-flush*: the old promise was removed. No promise currently cached.
 Each event is emitted with the LoadNCache instance as argument.
 
-## Dependancies
-This library was meant to have as few dependancies as possibile. Currently at runtime it only depends on an EventEmitter implementation. I choosed not to use the node.js implementation because is not available on browsers.
+## Dependencies
+This library was meant to have as few dependencies as possible. Currently at runtime it only depends on an EventEmitter implementation. I choosed not to use the node.js implementation because is not available on browsers.
 Also be sure that Promises are supported by your target platform both natively or using a polyfill.
 
 ## Pitfalls
 ### Rejected promises are not persisted!
-Only promises fulfilled are persisted using the persistance manager. Rejected promises are not persisted as design. The main reason behind this choice is to make it easier to handle persistance errors. I can refactor the code to allow for storing refused promises but I can't see a useful use case right now. Let me know if you have a different opinion.
+Only promises fulfilled are persisted using the persistence manager. Rejected promises are not persisted as design. The main reason behind this choice is to make it easier to handle persistence errors. I can refactor the code to allow for storing refused promises but I can't see a useful use case right now. Let me know if you have a different opinion.
 
 ### Autoflush is relative to promise resolution/rejection
 The autoflush time is measured starting at promise resolution or rejection. So if 5000ms are configured and promise resolution took 60000ms then the .flush() method will be called after 65000ms.
-Also remember that the autoflush may be subject to short delays due to javascript event queue. 
+Also remember that the autoflush may be subject to short delays due to JavaScript event queue. 
 
 ## Examples
 I've created an angular 9 project to show what this library can do with few lines of codes. You can find it here:
-XXXXXXXXXXXXx
+- https://github.com/monesidn/load-n-cache-test-app
 Also you can play with the related stackblitz. Have fun! 
+- https://stackblitz.com/github/monesidn/load-n-cache-test-app
 
 ## Recipes
 ### Load user data and store them for up to 10 minutes.
