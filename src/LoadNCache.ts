@@ -14,7 +14,7 @@ const defaultCfg: Configuration<any> = {
     persistence: new NoopManager()
 };
 
-const defaultPersistanceManagers: { [index: string]: (key: string) => PersistenceManager<any> } = {
+const defaultPersistenceManagers: { [index: string]: (key: string) => PersistenceManager<any> } = {
     'localStorage': (key: string) => new LocalStorageManager(key),
     'sessionStorage': (key: string) => new SessionStorageManager(key)
 };
@@ -68,13 +68,13 @@ export class LoadNCache<T> extends EventEmitter {
 
         // Resolve persistence manager if a name was given.
         if (typeof this.config.persistence === 'string') {
-            const pm = defaultPersistanceManagers[this.config.persistence];
+            const pm = defaultPersistenceManagers[this.config.persistence];
             const pmKey = this.config.persistenceKey;
             if (pm && pmKey) {
                 this.persistenceManager = pm(pmKey);
             } else {
-                console.error(`Unknown persistance manager requested (${this.config.persistence}) ` +
-                    `or empty persistanceKey. Defaulting to Noop.`);
+                console.error(`Unknown persistence manager requested (${this.config.persistence}) ` +
+                    `or empty persistenceKey. Defaulting to Noop.`);
                 this.persistenceManager = new NoopManager();
             }
         } else if (this.config.persistence) {

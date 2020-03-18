@@ -83,10 +83,10 @@ The LoadNCache constructor accept an options object. If default options are ok f
 * `loader: () => any`: the loadFunction. This is the only option that must be provided.
 * `disableEvents: boolean`: don't want events to be dispatched? Set this to true. Defaults to false.
 * `autoFlush: number | AutoflushManager`: specify the autoflush policy. It can be an object that implements a custom logic or a number. A number is handled like a time to live so, after a value is fetched, it is retained for up to ttl milliseconds. Setting this value to 0 or undefined disable this feature. 
-* `persistance: string | PersistanceManager`: specify how the value should be persisted. You can provide a custom `PersistanceManager` or use one of the provided implementation. To use a provided implementation pass one of the supported strings:
+* `persistence: string | PersistenceManager`: specify how the value should be persisted. You can provide a custom `PersistenceManager` or use one of the provided implementation. To use a provided implementation pass one of the supported strings:
     * `localStorage`: the promise result is serialized as JSON and stored into localStorage. You must provide a storageKey option to specify the name of the localStorage key.
     * `sessionStorage`: the promise result is serialized as JSON and stored into sessionStorage. You must provide a storageKey option to specify the name of the sessionStorage key.
-* `persistanceKey: string`: if persisting on a default key-value storage (localStorage or sessionStorage) this option specify the key to use to store data.
+* `persistenceKey: string`: if persisting on a default key-value storage (localStorage or sessionStorage) this option specify the key to use to store data.
 
 #### .get()
 Retrieve the value. Always returns a promise. This call may result in the loadFunction being called but is up to the instance to decide whatever this should happen or not.
@@ -155,8 +155,8 @@ class PrivilegeService{
     constructor(){
         this._roles = new LoadNCache({
            loader: () => fetch('/roles'),
-           persistance: 'localStorage',
-           persistanceKey: 'security-roles'
+           persistence: 'localStorage',
+           persistenceKey: 'security-roles'
         });
     }
 

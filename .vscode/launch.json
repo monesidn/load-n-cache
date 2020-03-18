@@ -25,7 +25,7 @@
             "args": [
                 "--runInBand",
                 "-t",
-                "Persistance"
+                "Persistence"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
