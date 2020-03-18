@@ -36,7 +36,7 @@ export class LoadNCache<T> extends EventEmitter {
     /**
      * Persistence manager casted to right type.
      */
-    private readonly persistanceManager: PersistenceManager<T>;
+    private readonly persistenceManager: PersistenceManager<T>;
 
     /**
      * Metadata associated to the promise below.
@@ -71,16 +71,16 @@ export class LoadNCache<T> extends EventEmitter {
             const pm = defaultPersistanceManagers[this.config.persistence];
             const pmKey = this.config.persistenceKey;
             if (pm && pmKey) {
-                this.persistanceManager = pm(pmKey);
+                this.persistenceManager = pm(pmKey);
             } else {
                 console.error(`Unknown persistance manager requested (${this.config.persistence}) ` +
                     `or empty persistanceKey. Defaulting to Noop.`);
-                this.persistanceManager = new NoopManager();
+                this.persistenceManager = new NoopManager();
             }
         } else if (this.config.persistence) {
-            this.persistanceManager = this.config.persistence as PersistenceManager<T>;
+            this.persistenceManager = this.config.persistence as PersistenceManager<T>;
         } else {
-            this.persistanceManager = new NoopManager();
+            this.persistenceManager = new NoopManager();
         }
 
         // Resolve autoflush manager when a number is passed.
@@ -113,7 +113,7 @@ export class LoadNCache<T> extends EventEmitter {
     private async loadNewValue(): Promise<PromiseWithMetadata<T>> {
         if (this.firstLoad) {
             try {
-                const val = await this.persistanceManager.loadValue();
+                const val = await this.persistenceManager.loadValue();
 
                 // If val is not the type of object we expect or is already
                 // expired we're going to ignore it.
@@ -146,7 +146,7 @@ export class LoadNCache<T> extends EventEmitter {
         const toPersist = promise.timestampedValue;
         try {
             if (toPersist)
-                await this.persistanceManager.saveValue(toPersist);
+                await this.persistenceManager.saveValue(toPersist);
         } catch (err) {
             console.warn('Error while persisting value', toPersist, err);
         }
@@ -157,7 +157,7 @@ export class LoadNCache<T> extends EventEmitter {
      */
     private async safelyCallClear() {
         try {
-            await this.persistanceManager.clear();
+            await this.persistenceManager.clear();
         } catch (err) {
             console.warn('Error while clearing persisted value', err);
         }
