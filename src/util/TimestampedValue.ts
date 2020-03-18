@@ -1,5 +1,5 @@
 /**
- * DTO used to exchange data with the persistance Layer
+ * DTO used to exchange data with the persistence Layer
  */
 export interface TimestampedValue<T>{
     /**

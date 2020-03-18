@@ -8,7 +8,7 @@ import { PromiseWithMetadata } from '../util/PromiseWithMetadata';
 export interface AutoflushManager<T> {
 
     /**
-     * When a value is fetched from persistance it may be already expired. This
+     * When a value is fetched from persistence it may be already expired. This
      * method is called after a value is read to check this condition. If this
      * method return resolve to true the `fetched` method will be called.
      * @param value
@@ -23,10 +23,10 @@ export interface AutoflushManager<T> {
      * Remember that:
      * - Never call the LoadNCache flush() method directly. Calling the provided
      *   callback will ensure that you will flush exactly the value you were passed
-     *   that is not necessarly the last one.
+     *   that is not necessarily the last one.
      * - If the flush policy is based on time use the timestamp from the `value`
-     *   object, never the current one. Thus will prevent inconsistant behaviour
-     *   with values fetched from persistance.
+     *   object, never the current one. Thus will prevent inconsistent behaviour
+     *   with values fetched from persistence.
      */
     fetched(value: PromiseWithMetadata<T>, flushCb: () => void): void;
 

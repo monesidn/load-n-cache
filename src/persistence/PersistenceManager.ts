@@ -4,7 +4,7 @@ import { TimestampedValue } from '../util/TimestampedValue';
 /**
  * Provide logic to save and retrieve a value from storage.
  */
-export interface PersistanceManager<T> {
+export interface PersistenceManager<T> {
     /**
      * This method must load the value from storage. If no value is available
      * return a rejected promise without error.

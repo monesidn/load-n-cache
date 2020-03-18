@@ -1,10 +1,10 @@
-import { PersistanceManager } from './PersistanceManager';
+import { PersistenceManager } from './PersistenceManager';
 import { TimestampedValue } from '../util/TimestampedValue';
 
 /**
  * Simple root class for both localStorage and sessionStorage.
  */
-class BasicBrowserStorage implements PersistanceManager<any> {
+class BasicBrowserStorage implements PersistenceManager<any> {
     /**
      * @param {any} storage Where to store values, local or session Storage.
      * @param {string} Key used to save/retrieve the value.
@@ -42,7 +42,7 @@ class BasicBrowserStorage implements PersistanceManager<any> {
 }
 
 /**
- * The local storage implemenetation.
+ * The local storage implementation.
  */
 export class LocalStorageManager extends BasicBrowserStorage {
     /**
@@ -66,9 +66,9 @@ export class SessionStorageManager extends BasicBrowserStorage {
 }
 
 /**
- * Dummy persistance manager. Used as a default.
+ * Dummy persistence manager. Used as a default.
  */
-export class NoopManager implements PersistanceManager<any> {
+export class NoopManager implements PersistenceManager<any> {
     /**
      * Noop.
      * @return {Promise} a resolved promise

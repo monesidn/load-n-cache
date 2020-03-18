@@ -1,13 +1,13 @@
 # Load 'n' Cache
 *Read it like "Rock 'n' roll" or "Lock 'n' load"*
 
-This is a simple library that I initially wrote while working on a large AngularJS application. The goal is to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user informations for 10 minutes but it quickly become a corner stone of the project. 
+This is a simple library that I initially wrote while working on a large AngularJS application. The goal is to make it easier to perform an async resource load and cache the result. It started as a simple aid to store user information for 10 minutes but it quickly become a corner stone of the project. 
 
-Being this useful i thought it was a pity not to make it public and available for modern javascript frameworks. Enough said, I decided to rewrite it from scratch and make it freely available.
+Being this useful I thought it was a pity not to make it public and available for modern JavaScript frameworks. Enough said, I decided to rewrite it from scratch and make it freely available.
 
 ## The problem 
 As any other library this one solves a common problem, load a resource, the result of a REST service for instance, and make it available for subsequent calls without calling the service again or impacting calling code. Check the following code as an example of what **NOT TO DO**.
-
+ 
 ```javascript
 var user;
 
@@ -22,7 +22,7 @@ function getUser() {
     return user;
 }
 ```
-The code above is loosely based on something i found in a production environment and has a lot of problems:
+The code above is loosely based on something I found in a production environment and has a lot of problems:
 1. Invoking getUser() multiple times may trigger multiple subsequent calls to the backend.
 1. You can never be sure if user is undefined because the backend did not worked or it's not loaded yet.
 You can improve this code by making wise usage of promises patterns but, as you take more scenarios into account, handling gets harder.
@@ -41,7 +41,7 @@ function getUser() {
 The LoadNCache object will take care of:
 * Call the provided "loadFunction" the first time the `get()` method is called;
 * call the function again if the cached value is invalidated (e.g. for an explicit call to `.flush()` or the configured "autoflush" occurred);
-* return the same promise over and over again, this mean that it is immediatly resolved if the value was already fetched;
+* return the same promise over and over again, this mean that it is immediately resolved if the value was already fetched;
 * returning the same promise also mean that you can `.catch()` the error multiple times from different callers;
 * emit events upon status changes. You need to update something when a new value is fetched? Just listen for the `'after-load'` event.
 
@@ -53,11 +53,11 @@ LoadNCache is a class that is only responsible for calling a "loadFunction" at t
 * Load a short-lived value from the server only if it is actually needed, like the server date and time. 
 
 ### What is a "loadFunction"?
-As the names goes it's a javascript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
+As the names goes it's a JavaScript function responsible for loading the data that are going to be stored. It may return a primitive value, an object or a promise, so also async functions are welcome. There are no constraints on how the value can obtained. 
 The return value of the loadFunction is handled as follows
 * if it is undefined, null or any other value, except for Promises, it is wrapped into a resolved promise and stored;
 * If it is a Promise the value is stored as is.
-The loadFunction should be stateless as it may be called immediatly, in the future or never. 
+The loadFunction should be stateless as it may be called immediately, in the future or never. 
 
 So when the loadFunction is called? Anytime a new value needs to be retrieved. This usually happen after a call to the .get() method if no cached value is available. If a persisted value is available it may happen that the loadFunction is never called.
 
@@ -67,12 +67,12 @@ The LoadNCache constructor accept an options object. If default options are ok f
 
 ##### Options
 * `loader: () => any`: the loadFunction. This is the only option that must be provided.
-* `disableEvents: boolean`: don't want events to be dispathed? Set this to true. Defaults to false.
-* `autoFlushTime: number`: how long (in millis) the value should be kept. As soon as time elapsed an automatic call to .flush() is executed. Setting it to 0 or a negative value disable this feature. Defaults to 0.
+* `disableEvents: boolean`: don't want events to be dispatched? Set this to true. Defaults to false.
+* `autoFlushTime: number`: how long (milliseconds) the value should be kept. As soon as time elapsed an automatic call to .flush() is executed. Setting it to 0 or a negative value disable this feature. Defaults to 0.
 * `persistance: string | PersistanceManager`: there are 2 supported string values:
     * `localStorage`: the promise result is serialized as JSON and stored into localStorage. You must provide a storageKey option to specify the name of the localStorage key.
     * `sessionStorage`: the promise result is serialized as JSON and stored into sessionStorage. You must provide a storageKey option to specify the name of the sessionStorage key.
-    * Or you can provied your own PersistanceManager by implementing the interface. 
+    * Or you can provide your own PersistenceManager by implementing the interface. 
 * `persistanceKey: string`: if persisting on a default key-value storage (localStorage or sessionStorage) this option specify the key to use to store data.
 
 #### .get()

@@ -2,8 +2,8 @@ import { EventEmitter } from 'eventemitter3';
 import { AutoflushManager } from './autoflush/AutoflushManager';
 import { DefaultAutoflushManager } from './autoflush/DefaultAutoflushManager';
 import { Configuration } from './Configuration';
-import { LocalStorageManager, NoopManager, SessionStorageManager } from './persistance/DefaultStorages';
-import { PersistanceManager } from './persistance/PersistanceManager';
+import { LocalStorageManager, NoopManager, SessionStorageManager } from './persistence/DefaultStorages';
+import { PersistenceManager } from './persistence/PersistenceManager';
 import { PromiseWithMetadata } from './util/PromiseWithMetadata';
 import { isTimestampedValue } from './util/TimestampedValue';
 
@@ -11,10 +11,10 @@ import { isTimestampedValue } from './util/TimestampedValue';
 const defaultCfg: Configuration<any> = {
     disableEvents: false,
     autoFlush: 0,
-    persistance: new NoopManager()
+    persistence: new NoopManager()
 };
 
-const defaultPersistanceManagers: { [index: string]: (key: string) => PersistanceManager<any> } = {
+const defaultPersistanceManagers: { [index: string]: (key: string) => PersistenceManager<any> } = {
     'localStorage': (key: string) => new LocalStorageManager(key),
     'sessionStorage': (key: string) => new SessionStorageManager(key)
 };
@@ -34,9 +34,9 @@ export class LoadNCache<T> extends EventEmitter {
     private readonly autoflushManager?: AutoflushManager<T>;
 
     /**
-     * Persistance manager casted to right type.
+     * Persistence manager casted to right type.
      */
-    private readonly persistanceManager: PersistanceManager<T>;
+    private readonly persistanceManager: PersistenceManager<T>;
 
     /**
      * Metadata associated to the promise below.
@@ -66,19 +66,19 @@ export class LoadNCache<T> extends EventEmitter {
             throw new Error('No loader function given or it is not a function!');
         }
 
-        // Resolve persistance manager if a name was given.
-        if (typeof this.config.persistance === 'string') {
-            const pm = defaultPersistanceManagers[this.config.persistance];
-            const pmKey = this.config.persistanceKey;
+        // Resolve persistence manager if a name was given.
+        if (typeof this.config.persistence === 'string') {
+            const pm = defaultPersistanceManagers[this.config.persistence];
+            const pmKey = this.config.persistenceKey;
             if (pm && pmKey) {
                 this.persistanceManager = pm(pmKey);
             } else {
-                console.error(`Unknown persistance manager requested (${this.config.persistance}) ` +
+                console.error(`Unknown persistance manager requested (${this.config.persistence}) ` +
                     `or empty persistanceKey. Defaulting to Noop.`);
                 this.persistanceManager = new NoopManager();
             }
-        } else if (this.config.persistance) {
-            this.persistanceManager = this.config.persistance as PersistanceManager<T>;
+        } else if (this.config.persistence) {
+            this.persistanceManager = this.config.persistence as PersistenceManager<T>;
         } else {
             this.persistanceManager = new NoopManager();
         }
@@ -116,7 +116,7 @@ export class LoadNCache<T> extends EventEmitter {
                 const val = await this.persistanceManager.loadValue();
 
                 // If val is not the type of object we expect or is already
-                // expired we'r going to ignore it.
+                // expired we're going to ignore it.
                 if (isTimestampedValue(val)) {
                     const metadata = await PromiseWithMetadata.from(val);
                     if (this.autoflushManager) {
@@ -131,7 +131,7 @@ export class LoadNCache<T> extends EventEmitter {
                 // If we have an error we print it for the sake of debugging but
                 // no further actions are required.
                 if (err)
-                    console.warn('Persistance error while loading value.', err);
+                    console.warn('Persistence error while loading value.', err);
             }
         }
 
@@ -139,7 +139,7 @@ export class LoadNCache<T> extends EventEmitter {
     }
 
     /**
-     * Calls the persistanceManager saveValue method handling exceptions.
+     * Calls the persistenceManager saveValue method handling exceptions.
      * @param {PromiseWithMetadata} promise The PromiseWithMetadata object that stores the data to persist.
      */
     private async safelyCallPersist(promise: PromiseWithMetadata<T>) {
@@ -153,7 +153,7 @@ export class LoadNCache<T> extends EventEmitter {
     }
 
     /**
-     * Calls the persistanceManager clear method handling exceptions.
+     * Calls the persistenceManager clear method handling exceptions.
      */
     private async safelyCallClear() {
         try {
@@ -188,7 +188,7 @@ export class LoadNCache<T> extends EventEmitter {
 
             /**
              * Can't use async here because the promise field must be setted
-             * immediatly to avoid multiple calls to the loadFn.
+             * immediately to avoid multiple calls to the loadFn.
              */
             this.promise = this.loadNewValue().then(async (metadata: PromiseWithMetadata<T>) => {
                 this.metadata = metadata;
@@ -237,7 +237,7 @@ export class LoadNCache<T> extends EventEmitter {
 
     /**
      * Shortcut to call flush() and get() one after the other.
-     * @return {Promise} the same promise that .get() whould return.
+     * @return {Promise} the same promise that .get() would return.
      */
     public async refresh() {
         await this.flush();
