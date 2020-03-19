@@ -1,6 +1,6 @@
 {
   "name": "load-n-cache",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Helps developers to cache slowly changing resources",
   "repository": {
     "type": "git",
