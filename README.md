@@ -128,7 +128,7 @@ Also remember that the autoflush may be subject to short delays due to JavaScrip
 I've created an angular 9 project to show what this library can do with few lines of codes. You can find it here:
 - https://github.com/monesidn/load-n-cache-test-app
 Also you can play with the related Stackblitz. Have fun! 
-- https://stackblitz.com/github/monesidn/load-n-cache-test-app
+- https://stackblitz.com/edit/load-n-cache-test-app
 
 ## Recipes
 ### Load user data and stores them for up to 10 minutes.
