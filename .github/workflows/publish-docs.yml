@@ -27,7 +27,7 @@ jobs:
               run: yarn install --immutable
 
             - name: Build documentation files
-              run: yarn build-docs
+              run: yarn build:docs
 
             - name: Upload docs artifact
               uses: actions/upload-pages-artifact@v1
