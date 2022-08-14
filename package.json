@@ -1,5 +1,5 @@
 {
-  "name": "load-n-cache",
+  "name": "@monesidn/load-n-cache",
   "version": "1.0.3",
   "description": "Helps developers to cache slowly changing resources",
   "repository": {

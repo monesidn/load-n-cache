@@ -66,18 +66,21 @@ yarn add @monesidn/load-n-cache
 and then you can:
 
 ```typescript
-import { LoadNCache } from "load-n-cache";
+import { LoadNCache } from "@monesidn/load-n-cache";
 ```
 
-## RxJs
+## FAQ
+
+### RxJs
 
 -   Q: "Wow cool, but I'm using Observables not promises"
--   A: Take a look at: https://github.com/monesidn/load-n-cache-rxjs
+-   A: Take a look at the sister project: https://github.com/monesidn/load-n-cache-rxjs
 
-## Why can't I just use a memoized function?
+### Memoized functions?
 
-Well memoized functions are great but this small library provide a much greater degree of flexibility. Check the
-API before deciding!
+-   Q: how about using a memoized function?
+-   A: Well memoized functions are great but this small library provide a much greater degree of flexibility. Check the
+    API before deciding!
 
 ## In depth Documentation
 
@@ -102,6 +105,7 @@ So when the loadFunction is called? Anytime a new value needs to be retrieved. T
 ### LoadNCache API
 
 Check out the gitpages!
+https://monesidn.github.io/load-n-cache/
 
 ### About persistence
 

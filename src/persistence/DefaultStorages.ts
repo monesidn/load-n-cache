@@ -29,7 +29,11 @@ class BasicBrowserStorage implements PersistenceManager<any> {
     async loadValue(): Promise<any> {
         const data = this.storage.getItem(this.key);
         if (!data) return;
-        return JSON.parse(data);
+        const tsVal = JSON.parse(data);
+        if (!("value" in tsVal)) {
+            tsVal.value = undefined;
+        }
+        return tsVal;
     }
 
     /**
