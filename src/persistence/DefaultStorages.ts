@@ -1,5 +1,5 @@
-import { PersistenceManager } from './PersistenceManager';
-import { TimestampedValue } from '../util/TimestampedValue';
+import { PersistenceManager } from "./PersistenceManager";
+import { TimestampedValue } from "../util/TimestampedValue";
 
 /**
  * Simple root class for both localStorage and sessionStorage.
@@ -9,8 +9,7 @@ class BasicBrowserStorage implements PersistenceManager<any> {
      * @param {any} storage Where to store values, local or session Storage.
      * @param {string} Key used to save/retrieve the value.
      */
-    constructor(private storage: Storage, private key: string) {
-    }
+    constructor(private storage: Storage, private key: string) {}
 
     /**
      * @param {any} value The value to persist.
@@ -30,7 +29,7 @@ class BasicBrowserStorage implements PersistenceManager<any> {
     async loadValue(): Promise<any> {
         const data = this.storage.getItem(this.key);
         if (!data) return;
-        return JSON.parse(data!);
+        return JSON.parse(data);
     }
 
     /**
@@ -88,6 +87,6 @@ export class NoopManager implements PersistenceManager<any> {
     /**
      * Noop.
      */
-    clear() {
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    clear() {}
 }

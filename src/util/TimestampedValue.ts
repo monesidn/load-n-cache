@@ -1,7 +1,7 @@
 /**
  * DTO used to exchange data with the persistence Layer
  */
-export interface TimestampedValue<T>{
+export interface TimestampedValue<T> {
     /**
      * The timestamp
      */
@@ -18,6 +18,6 @@ export interface TimestampedValue<T>{
  * @param {any} obj The object to inspect
  * @return {boolean} whatever it is.
  */
-export function isTimestampedValue(obj: any): obj is TimestampedValue<any> {
-    return obj && typeof obj.ts === 'number';
+export function isTimestampedValue(obj: unknown): obj is TimestampedValue<unknown> {
+    return !!obj && typeof obj === "object" && typeof (obj as any).ts === "number";
 }

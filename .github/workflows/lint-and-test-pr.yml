@@ -1,0 +1,33 @@
+name: Lint & Test PR
+
+# Begin a preview build every time a pull request is opened.
+#
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    
+env:
+  NODE_VERSION: 18
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js $NODE_VERSION
+        uses: actions/setup-node@v3
+        with:
+            node-version: $NODE_VERSION
+
+      - name: Installing
+        run: yarn
+
+      - name: Building
+        run: yarn build
+
+      - name: Linting
+        run: yarn lint
+
+      - name: Unit Testing
+        run: yarn test

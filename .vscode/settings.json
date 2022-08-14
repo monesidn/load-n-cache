@@ -6,5 +6,7 @@
         "markdown",
         "latex",
         "plaintext"
-    ]
+    ],
+    "editor.formatOnSave": true,
+    "tslint.autoFixOnSave": true,
 }

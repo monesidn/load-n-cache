@@ -1,4 +1,4 @@
-import { TimestampedValue, isTimestampedValue } from './TimestampedValue';
+import { TimestampedValue, isTimestampedValue } from "./TimestampedValue";
 
 /**
  * Utility object to store a single promise and associated metadata that
@@ -10,7 +10,7 @@ export class PromiseWithMetadata<T> {
     /**
      * Creates a new Promise wrapper
      * @param {boolean} resolved Was this promise resolved?
-     * @param {boolean} rejected  Was this promise rejected?
+     * @param {boolean} rejected Was this promise rejected?
      * @param {number} completedAt When was this promise resolved or rejected?
      * @param {Promise} promise The promise this object wraps.
      * @param {any} value If the promise resolved the unwrapped value.
@@ -25,6 +25,7 @@ export class PromiseWithMetadata<T> {
         if (resolved) {
             this.timestampedValue = {
                 ts: this.completedAt,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 value: value!
             };
         }

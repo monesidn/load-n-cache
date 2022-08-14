@@ -1,6 +1,6 @@
 {
   "name": "load-n-cache",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Helps developers to cache slowly changing resources",
   "repository": {
     "type": "git",
@@ -11,27 +11,30 @@
   "scripts": {
     "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
     "test": "jest",
+    "build:docs": "typedoc",
     "build": "tsc",
+    "lint": "eslint src/* --ext .ts",
     "prestart": "npm run build",
     "start": "node dist/index.js",
-    "clean": "rimraf dist && npm run test",
+    "clean": "rimraf dist coverage",
     "prepublishOnly": "npm run build && npm run test"
   },
   "author": "Daniele Monesi",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^25.1.4",
-    "@typescript-eslint/eslint-plugin": "^2.24.0",
-    "@typescript-eslint/parser": "^2.24.0",
-    "eslint": "^6.8.0",
-    "eslint-config-google": "^0.14.0",
-    "jest": "^25.1.0",
-    "jest-localstorage-mock": "^2.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.33.0",
+    "@typescript-eslint/parser": "^5.33.0",
+    "eslint": "^8.22.0",
+    "jest": "^28.1.3",
+    "jest-localstorage-mock": "^2.4.22",
     "rimraf": "^3.0.2",
-    "ts-jest": "^25.2.1",
-    "typescript": "^3.8.3"
+    "ts-jest": "^28.0.7",
+    "typedoc": "^0.23.10",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
-    "eventemitter3": "^4.0.0"
-  }
+    "eventemitter3": "^4.0.7"
+  },
+  "packageManager": "yarn@3.2.2"
 }

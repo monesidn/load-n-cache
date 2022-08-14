@@ -1,22 +1,21 @@
-import { EventEmitter } from 'eventemitter3';
-import { AutoflushManager } from './autoflush/AutoflushManager';
-import { DefaultAutoflushManager } from './autoflush/DefaultAutoflushManager';
-import { Configuration } from './Configuration';
-import { LocalStorageManager, NoopManager, SessionStorageManager } from './persistence/DefaultStorages';
-import { PersistenceManager } from './persistence/PersistenceManager';
-import { PromiseWithMetadata } from './util/PromiseWithMetadata';
-import { isTimestampedValue } from './util/TimestampedValue';
+import { EventEmitter } from "eventemitter3";
+import { AutoflushManager } from "./autoflush/AutoflushManager";
+import { DefaultAutoflushManager } from "./autoflush/DefaultAutoflushManager";
+import { Configuration } from "./Configuration";
+import { LocalStorageManager, NoopManager, SessionStorageManager } from "./persistence/DefaultStorages";
+import { PersistenceManager } from "./persistence/PersistenceManager";
+import { PromiseWithMetadata } from "./util/PromiseWithMetadata";
+import { isTimestampedValue } from "./util/TimestampedValue";
 
-
-const defaultCfg: Configuration<any> = {
+const defaultCfg: Partial<Configuration<unknown>> = {
     disableEvents: false,
     autoFlush: 0,
     persistence: new NoopManager()
 };
 
 const defaultPersistenceManagers: { [index: string]: (key: string) => PersistenceManager<any> } = {
-    'localStorage': (key: string) => new LocalStorageManager(key),
-    'sessionStorage': (key: string) => new SessionStorageManager(key)
+    localStorage: (key: string) => new LocalStorageManager(key),
+    sessionStorage: (key: string) => new SessionStorageManager(key)
 };
 
 /**
@@ -54,27 +53,31 @@ export class LoadNCache<T> extends EventEmitter {
     private firstLoad = true;
 
     /**
-     * Initialize the object with given setting.
+     * The LoadNCache constructor accept an options object. If default options
+     * are ok for you then you can pass in a function. Passing a function is equivalent to  passing
+     * only the loader option in the options parameter.
      * @param {any} cfg Instance settings or a load function.
      */
     constructor(cfg: Configuration<T> | (() => Promise<T>)) {
         super();
 
-        this.config = Object.assign({}, defaultCfg, typeof cfg === 'function' ? { loader: cfg } : cfg);
+        this.config = Object.assign({}, defaultCfg, typeof cfg === "function" ? { loader: cfg } : cfg);
 
-        if (typeof this.config.loader !== 'function') {
-            throw new Error('No loader function given or it is not a function!');
+        if (typeof this.config.loader !== "function") {
+            throw new Error("No loader function given or it is not a function!");
         }
 
         // Resolve persistence manager if a name was given.
-        if (typeof this.config.persistence === 'string') {
+        if (typeof this.config.persistence === "string") {
             const pm = defaultPersistenceManagers[this.config.persistence];
             const pmKey = this.config.persistenceKey;
             if (pm && pmKey) {
                 this.persistenceManager = pm(pmKey);
             } else {
-                console.error(`Unknown persistence manager requested (${this.config.persistence}) ` +
-                    `or empty persistenceKey. Defaulting to Noop.`);
+                console.error(
+                    `Unknown persistence manager requested (${this.config.persistence}) ` +
+                        `or empty persistenceKey. Defaulting to Noop.`
+                );
                 this.persistenceManager = new NoopManager();
             }
         } else if (this.config.persistence) {
@@ -85,7 +88,7 @@ export class LoadNCache<T> extends EventEmitter {
 
         // Resolve autoflush manager when a number is passed.
         if (this.config.autoFlush !== undefined) {
-            if (typeof this.config.autoFlush === 'number') {
+            if (typeof this.config.autoFlush === "number") {
                 if (this.config.autoFlush <= 0) {
                     this.autoflushManager = undefined;
                 } else {
@@ -102,7 +105,7 @@ export class LoadNCache<T> extends EventEmitter {
      * The check is ensured implicitly by using the async qualifier.
      */
     private async callLoadFunction() {
-        return this.config.loader!();
+        return this.config.loader();
     }
 
     /**
@@ -121,8 +124,7 @@ export class LoadNCache<T> extends EventEmitter {
                     const metadata = await PromiseWithMetadata.from(val);
                     if (this.autoflushManager) {
                         const expired = await this.autoflushManager.isExpired(metadata);
-                        if (!expired)
-                            return metadata;
+                        if (!expired) return metadata;
                     } else {
                         return metadata;
                     }
@@ -130,8 +132,7 @@ export class LoadNCache<T> extends EventEmitter {
             } catch (err) {
                 // If we have an error we print it for the sake of debugging but
                 // no further actions are required.
-                if (err)
-                    console.warn('Persistence error while loading value.', err);
+                if (err) console.warn("Persistence error while loading value.", err);
             }
         }
 
@@ -145,10 +146,9 @@ export class LoadNCache<T> extends EventEmitter {
     private async safelyCallPersist(promise: PromiseWithMetadata<T>) {
         const toPersist = promise.timestampedValue;
         try {
-            if (toPersist)
-                await this.persistenceManager.saveValue(toPersist);
+            if (toPersist) await this.persistenceManager.saveValue(toPersist);
         } catch (err) {
-            console.warn('Error while persisting value', toPersist, err);
+            console.warn("Error while persisting value", toPersist, err);
         }
     }
 
@@ -159,7 +159,7 @@ export class LoadNCache<T> extends EventEmitter {
         try {
             await this.persistenceManager.clear();
         } catch (err) {
-            console.warn('Error while clearing persisted value', err);
+            console.warn("Error while clearing persisted value", err);
         }
     }
 
@@ -177,14 +177,13 @@ export class LoadNCache<T> extends EventEmitter {
     }
 
     /**
-     * Returns the requested value. Could be a freshly downloaded value
-     * or a stored one.
+     * Retrieve the value. Always returns a promise. This call will result in the invocation of
+     * loadFunction if no cached value is available at the time.
      * @return {Promise} A promise that will be resolved with the value or reject if fetching fails.
      */
     public get() {
         if (!this.promise) {
-            if (!this.config.disableEvents)
-                this.emit('before-load', this);
+            if (!this.config.disableEvents) this.emit("before-load", this);
 
             /**
              * Can't use async here because the promise field must be setted
@@ -201,8 +200,7 @@ export class LoadNCache<T> extends EventEmitter {
                     this.autoflushManager.fetched(this.metadata, cb);
                 }
 
-                if (!this.config.disableEvents)
-                    this.emit('after-load', this);
+                if (!this.config.disableEvents) this.emit("after-load", this);
 
                 return metadata.promise;
             });
@@ -212,31 +210,29 @@ export class LoadNCache<T> extends EventEmitter {
     }
 
     /**
-     * Flush the current cached value.
+     * Invalidate the currently cached value if any. If no value is cached then this method does nothing.
+     * Each subsequent call to `.get()` will get a different promise object then before.
      */
     public async flush() {
         if (!this.metadata) {
             return;
         }
 
-        if (!this.config.disableEvents)
-            this.emit('before-flush', this);
-
+        if (!this.config.disableEvents) this.emit("before-flush", this);
 
         if (this.autoflushManager) {
             this.autoflushManager.flushed(this.metadata);
         }
 
-        this.metadata = this.metadata;
+        this.metadata = undefined;
         this.promise = undefined;
         await this.safelyCallClear();
 
-        if (!this.config.disableEvents)
-            this.emit('after-flush', this);
+        if (!this.config.disableEvents) this.emit("after-flush", this);
     }
 
     /**
-     * Shortcut to call flush() and get() one after the other.
+     * Shortcut for calling `.flush()` and `.get()`. Returns the promise from `.get()`.
      * @return {Promise} the same promise that .get() would return.
      */
     public async refresh() {

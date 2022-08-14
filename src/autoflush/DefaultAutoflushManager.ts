@@ -1,6 +1,5 @@
-import { AutoflushManager } from './AutoflushManager';
-import { TimestampedValue } from '../util/TimestampedValue';
-import { PromiseWithMetadata } from '../util/PromiseWithMetadata';
+import { PromiseWithMetadata } from "../util/PromiseWithMetadata";
+import { AutoflushManager } from "./AutoflushManager";
 
 /**
  * Default implementation of AutoflushManager that mark a value expired after
@@ -13,8 +12,7 @@ export class DefaultAutoflushManager implements AutoflushManager<any> {
      * Construct the manager providing the ttl to use.
      * @param {number} ttl The ttl. Milliseconds.
      */
-    constructor(private readonly ttl: number) {
-    }
+    constructor(private readonly ttl: number) {}
 
     /**
      * This method computes how long a value fetched at the given timestamp
@@ -35,7 +33,6 @@ export class DefaultAutoflushManager implements AutoflushManager<any> {
     async isExpired(value: PromiseWithMetadata<any>) {
         return this.computeTtl(value.completedAt) <= 0;
     }
-
 
     /**
      * Setup the timeout.
