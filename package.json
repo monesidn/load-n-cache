@@ -1,6 +1,6 @@
 {
   "name": "@monesidn/load-n-cache",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Helps developers to cache slowly changing resources",
   "repository": {
     "type": "git",
