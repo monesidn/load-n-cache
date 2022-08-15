@@ -1,0 +1,57 @@
+name: Tag, Release and Publish New Versions
+
+on:
+    push:
+        branches: [master, main]
+
+jobs:
+    tag:
+        name: tag
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 2
+
+            - id: tag-creation
+              uses: salsify/action-detect-and-tag-new-version@v2
+              with:
+                  version-command: |
+                      cat ./package.json | jq --raw-output '.version'
+
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+
+            - name: Install deps
+              if: ${{ startsWith(steps.tag-creation.outputs.tag, 'v') }}
+              run: yarn install --immutable
+
+            - name: Testing Build
+              if: ${{ startsWith(steps.tag-creation.outputs.tag, 'v') }}
+              run: yarn build
+
+            - name: Linting
+              if: ${{ startsWith(steps.tag-creation.outputs.tag, 'v') }}
+              run: yarn lint
+
+            - name: Unit Testing
+              if: ${{ startsWith(steps.tag-creation.outputs.tag, 'v') }}
+              run: yarn test
+
+            - name: Create release from tag
+              if: ${{ startsWith(steps.tag-creation.outputs.tag, 'v') }}
+              uses: softprops/action-gh-release@v1
+              with:
+                  token: "${{ secrets.GITHUB_TOKEN }}"
+                  generate_release_notes: true
+                  tag_name: ${{ steps.tag-creation.outputs.tag }}
+                  prerelease: false
+
+            - name: Publish to NPM
+              if: ${{ startsWith(steps.tag-creation.outputs.tag, 'v') }}
+              uses: JS-DevTools/npm-publish@v1
+              with:
+                  access: public
+                  token: ${{ secrets.NPM_TOKEN }}

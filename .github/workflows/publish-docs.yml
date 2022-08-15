@@ -1,8 +1,8 @@
 name: Generate and publish Docs
 
 on:
-    release:
-        types: [created]
+    push:
+        branches: [master, main]
 
 # Allow one concurrent deployment
 concurrency:
@@ -33,7 +33,7 @@ jobs:
                   path: "docs"
 
     # Deploy job
-    deploy:
+    deploy-gitpages:
         # Add a dependency to the build job
         needs: build
 
