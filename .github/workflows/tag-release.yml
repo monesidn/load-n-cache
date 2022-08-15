@@ -1,16 +1,17 @@
-name: Lint & Test PR
+name: Tag & Release New Versions
 
-# Begin a preview build every time a pull request is opened.
-#
 on:
-    pull_request:
-        types: [opened, synchronize, ready_for_review]
+    push:
+        branches: [main]
 
 jobs:
-    deploy-preview:
+    tag:
+        name: tag
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 2
 
             - name: Use Node.js 18
               uses: actions/setup-node@v3
@@ -20,7 +21,7 @@ jobs:
             - name: Installing
               run: yarn
 
-            - name: Building
+            - name: Testing Buil
               run: yarn build
 
             - name: Linting
@@ -28,3 +29,8 @@ jobs:
 
             - name: Unit Testing
               run: yarn test
+
+            - uses: salsify/action-detect-and-tag-new-version@v2
+              with:
+                  version-command: |
+                      cat ./package.json | jq --raw-output '.version'
