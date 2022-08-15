@@ -17,8 +17,8 @@ jobs:
               with:
                   node-version: 18
 
-            - name: Installing
-              run: yarn
+            - name: Install deps
+              run: yarn install --immutable
 
             - name: Building
               run: yarn build
